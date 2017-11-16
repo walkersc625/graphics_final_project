@@ -1,3 +1,6 @@
+#ifndef WINDOW_H
+#define WINDOW_H
+
 #include <GL/glew.h>
 #include <dirent.h>
 
@@ -14,17 +17,26 @@
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtx/io.hpp>
 #include <debuggl.h>
+#include "util.h"
 
 using namespace std;
 using namespace glm;
 
-void ErrorCallback(int error, const char* description)
+class Window
 {
-	std::cerr << "GLFW Error: " << description << "\n";
-}
+	int width = 800;
+	int height = 600;
+	string title = "Texture";
 
-int main(int argc, char* argv[])
-{
-	glfwSetErrorCallback(ErrorCallback);
-	return 0;
-}
+	//initialized in constructor
+	GLFWwindow *glWindow;
+
+	void init_glefw();
+
+	public:
+
+		Window() { init_glefw() };
+		~Window();
+};
+
+#endif
