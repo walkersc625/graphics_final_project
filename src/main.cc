@@ -15,8 +15,10 @@
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtx/io.hpp>
 #include <debuggl.h>
+#include <jpegio.h>
 
 #include "Window.h"
+#include "Texture.h"
 
 using namespace std;
 using namespace glm;
@@ -30,6 +32,10 @@ int main(int argc, char* argv[])
 {
 	Window w = Window();
 	glfwSetErrorCallback(ErrorCallback);
+
+	Texture t = Texture("../assets/diagonals.jpg");
+	glDrawPixels(t.image.width, t.image.height, GL_RGB, GL_UNSIGNED_BYTE, (void*) t.image.bytes.data());
+
 
 	while (!glfwWindowShouldClose(w.glWindow)) {
 		int width = w.width;
@@ -49,7 +55,7 @@ int main(int argc, char* argv[])
 		glCullFace(GL_BACK);
 
 		glfwPollEvents();
-		glfwSwapBuffers(w.glWindow);
+		//glfwSwapBuffers(w.glWindow);
 	}
 	glfwDestroyWindow(w.glWindow);
 	glfwTerminate();
