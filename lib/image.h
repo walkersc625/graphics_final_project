@@ -13,7 +13,8 @@ struct Image {
 	std::vector<unsigned char> bytes;
 	int width;
 	int height;
-	int stride; // Stores the actual number of bytes for a scan line, you can ignore this for our current case.
+	int stride; // Stores the actual number of bytes for a scan line,
+	            //you can ignore this for our current case.
 };
 
 #endif
