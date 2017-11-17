@@ -34,8 +34,18 @@ int main(int argc, char* argv[])
 	glfwSetErrorCallback(ErrorCallback);
 
 	Texture t = Texture("../assets/diagonals.jpg");
-	glDrawPixels(t.image.width, t.image.height, GL_RGB, GL_UNSIGNED_BYTE, (void*) t.image.bytes.data());
+	//glDrawPixels(t.image.width, t.image.height, GL_RGB, GL_UNSIGNED_BYTE, (void*) t.image.bytes.data());
 
+	//create canvas geometry
+	vector<vec4> corners;
+	corners.push_back(vec4(-1, 1, 0, 0));
+	corners.push_back(vec4(1, 1, 0, 0));
+	corners.push_back(vec4(1, -1, 0, 0));
+	corners.push_back(vec4(-1, -1, 0, 0));
+
+	uvec4 indices = uvec4(0, 1, 2, 3);
+
+	
 
 	while (!glfwWindowShouldClose(w.glWindow)) {
 		int width = w.width;
