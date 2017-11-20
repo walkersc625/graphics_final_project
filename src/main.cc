@@ -57,22 +57,42 @@ int main(int argc, char* argv[])
 
 	//create canvas geometry
 	vector<vec4> corners;
-	corners.push_back(vec4(-1.0f, 1.0f, 0.0f, 1.0f));
-	corners.push_back(vec4(1.0f, 1.0f, 0.0f, 1.0f));
-	corners.push_back(vec4(1.0f, -1.0f, 0.0f, 1.0f));
-	corners.push_back(vec4(-1.0f, -1.0f, 0.0f, 1.0f));
+	corners.push_back(vec4(-1.0f, 1.0f, 0.0f, 1.0f));	// Top left
+	corners.push_back(vec4(1.0f, 1.0f, 0.0f, 1.0f));	// Top right
+	corners.push_back(vec4(1.0f, -1.0f, 0.0f, 1.0f));	// Bot right
+	corners.push_back(vec4(-1.0f, -1.0f, 0.0f, 1.0f));	// Bot left
+
 	vector<uvec3> faces;
 	faces.push_back(uvec3(3,1,0));
 	faces.push_back(uvec3(1,3,2));
-	//uvec4 indices = uvec4(0, 1, 2, 3);
+
+	vector<vec2> uv_coords;
+	uv_coords.push_back(vec2(0, 1));
+	uv_coords.push_back(vec2(1, 1));
+	uv_coords.push_back(vec2(1, 0));
+	uv_coords.push_back(vec2(0, 0));
+
+	auto tex_data  = [t]() -> const void* {
+		return &t.id;
+	};
+
+	auto tex_binder = [t](int loc, const void* data) {
+		glUniform1i(loc, 0);
+		glActiveTexture(GL_TEXTURE0 + 0);
+	    glBindTexture(GL_TEXTURE_2D, (int)*data);
+	};
+
+	ShaderUniform texture_uniform = { "texture_sampler", tex_binder, tex_data };
+
 	RenderDataInput canvas_pass_input;
 	canvas_pass_input.assign(0, "vertex_position", corners.data(), corners.size(), 4, GL_FLOAT);
+	canvas_pass_input.assign(1, "vertex_uv", uv_coords.data(), uv_coords.size(), 2, GL_FLOAT);
 	canvas_pass_input.assign_index(faces.data(), faces.size(), 3);
 	RenderPass canvas_pass(
 		-1,
 		canvas_pass_input,
 		{vertex_shader, geometry_shader, fragment_shader},
-		{},
+		{texture_uniform},
 		{"color"}
 	);
 
