@@ -48,12 +48,12 @@ int main(int argc, char* argv[])
 	Window w = Window();
 	glfwSetErrorCallback(ErrorCallback);
 
-	Texture t = Texture("../assets/diagonals.jpg");
+	Texture t = Texture("../assets/cactus.jpg");
 	glGenTextures(1, &t.id);
 	glBindTexture(GL_TEXTURE_2D, t.id);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, t.image.width, t.image.height, 0, GL_RGB, GL_UNSIGNED_BYTE, t.image.bytes.data());
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
 	//create canvas geometry
 	vector<vec4> corners;
@@ -67,10 +67,10 @@ int main(int argc, char* argv[])
 	faces.push_back(uvec3(1,3,2));
 
 	vector<vec2> uv_coords;
-	uv_coords.push_back(vec2(0, 1));
-	uv_coords.push_back(vec2(1, 1));
-	uv_coords.push_back(vec2(1, 0));
 	uv_coords.push_back(vec2(0, 0));
+	uv_coords.push_back(vec2(1, 0));
+	uv_coords.push_back(vec2(1, 1));
+	uv_coords.push_back(vec2(0, 1));
 
 	auto tex_data  = [t]() -> const void* {
 		return &t.id;
@@ -78,8 +78,8 @@ int main(int argc, char* argv[])
 
 	auto tex_binder = [t](int loc, const void* data) {
 		glUniform1i(loc, 0);
-		glActiveTexture(GL_TEXTURE0 + 0);
-	    glBindTexture(GL_TEXTURE_2D, (int)*data);
+		glActiveTexture(GL_TEXTURE0);
+	    glBindTexture(GL_TEXTURE_2D, *(GLuint*)data);
 	};
 
 	ShaderUniform texture_uniform = { "texture_sampler", tex_binder, tex_data };
