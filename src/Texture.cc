@@ -5,6 +5,10 @@
 
 using namespace std;
 
+/*******************/
+/* Texture Methods */
+/*******************/
+
 Texture::Texture(const string filepath)
 {
 	if (!LoadJPEG(filepath, &image)) {
@@ -15,6 +19,10 @@ Texture::Texture(const string filepath)
 		printf("\timage height: %d\n", image.height);
 	}
 }
+
+/*****************/
+/* Synth Methods */
+/*****************/
 
 Synth::Synth(Texture t)
 {
@@ -30,6 +38,9 @@ Synth::~Synth()
 	delete[] pixels.data;
 }
 
+/***********************/
+/* PixelBuffer Methods */
+/***********************/
 
 Pixel* PixelBuffer::getPixel(unsigned int x, unsigned int y)
 {
@@ -40,15 +51,7 @@ Pixel* PixelBuffer::getPixel(unsigned int x, unsigned int y)
 	return &data[index];
 }
 
-Pixel* Patch::getPixel(unsigned int x, unsigned int y)
-{
-	if(x >= width || y >= width || sourceImage == nullptr) {
-		return nullptr;
-	}
-	return sourceImage->getPixel(x + offsetX, y + offsetY);
-}
-
-Patch getPatchAround(unsigned int x, unsigned int y, unsigned int patchWidth)
+Patch PixelBuffer::getPatchAround(unsigned int x, unsigned int y, unsigned int patchWidth)
 {
 	return Patch {
 		this,
@@ -58,17 +61,30 @@ Patch getPatchAround(unsigned int x, unsigned int y, unsigned int patchWidth)
 	};
 }
 
+/*****************/
+/* Patch Methods */
+/*****************/
+
+Pixel* Patch::getPixel(unsigned int x, unsigned int y)
+{
+	if(x >= width || y >= width || sourceImage == nullptr) {
+		return nullptr;
+	}
+	return sourceImage->getPixel(x + offsetX, y + offsetY);
+}
+
 float Patch::difference(Patch& other)
 {
-	if(other.width != width) {
+	if (other.width != width) {
 		cout << "Comparing patches of different sizes!\n";
 		return -1;
 	}
+
 	float diff = 0;
 	Pixel* pixelA;
 	Pixel* pixelB;
-	for(int x = 0; x < width; x++) {
-		for(int y = 0; y < width, y++) {
+	for (int x = 0; x < width; x++) {
+		for (int y = 0; y < width; y++) {
 			pixelA = getPixel(x, y);
 			pixelB = other.getPixel(x, y);
 			if(pixelA != nullptr && pixelB != nullptr) {

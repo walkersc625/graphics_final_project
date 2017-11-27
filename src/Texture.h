@@ -9,6 +9,10 @@
 
 using namespace std;
 
+struct PixelBuffer;
+struct Patch;
+
+//For loading sample textures
 struct Texture {
 	Image image;
 	GLuint id;
@@ -16,20 +20,14 @@ struct Texture {
 	Texture(const string filepath);
 };
 
+//Color information only
 struct Pixel {
 	unsigned char r;
 	unsigned char g;
 	unsigned char b;
 };
 
-struct PixelBuffer {
-	Pixel* data;
-	unsigned int width;
-
-	Pixel* getPixel(unsigned int x, unsigned int y);
-	Patch getPatchAround(unsigned int x, unsigned int y, unsigned int patchWidth);
-};
-
+//Small sampling window for algorithm
 struct Patch {
 	PixelBuffer* sourceImage;
 	unsigned int offsetX;
@@ -39,6 +37,16 @@ struct Patch {
 	float difference(Patch& other);
 };
 
+//Self-explanatory
+struct PixelBuffer {
+	Pixel* data;
+	unsigned int width;
+
+	Pixel* getPixel(unsigned int x, unsigned int y);
+	Patch getPatchAround(unsigned int x, unsigned int y, unsigned int patchWidth);
+};
+
+//Full texture being generated
 class Synth {
 
 	Synth(Texture t);
