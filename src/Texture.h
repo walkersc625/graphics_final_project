@@ -31,20 +31,22 @@ struct Patch;
 struct Texture {
 	Image image;
 	vector<vector<bool>> pixelsFilled;
-	Texture(Image i): image(i), pixelsFilled(i.width(), vector<bool>(i.height(), false)) {}
-	Pixel getPixel(unsigned int x, unsigned int y) const;
-	void setPixel(unsigned int x, unsigned int y, Pixel p);
-	Patch getPatch(unsigned int offsetX, unsigned int offsetY, unsigned int size);
+	Texture(Image i): image(i), pixelsFilled(i.width(),
+		vector<bool>(i.height(), false)) {}
+	Pixel getPixel(uint x, uint y) const;
+	void setPixel(uint x, uint y, Pixel p);
+	Patch getPatch(uint offsetX, uint offsetY, uint size);
 };
 
 //Small sampling window for algorithm
 struct Patch {
 	Texture* sourceImage;
-	unsigned int offsetX;
-	unsigned int offsetY;
-	unsigned int width;
-	Pixel getPixel(unsigned int x, unsigned int y) const;
-	void setPixel(unsigned int x, unsigned int y, Pixel p);
+	uint offsetX;
+	uint offsetY;
+	uint width;
+	Pixel getPixel(uint x, uint y) const;
+	void setPixel(uint x, uint y, Pixel p);
+	void copyPatch(Patch& src);
 	float difference(const Patch& other) const;
 };
 
@@ -56,12 +58,12 @@ public:
 	Texture sample;
 	Texture result;
 
-	unsigned int patchSize;
+	uint patchSize;
 
 	static constexpr int sideLength = 750;
 	static constexpr int sampleSideLength = 250;
 
-	Synth(Image i, unsigned int patchSize);
+	Synth(Image i, uint patchSize);
 	void synthesize();
 };
 
