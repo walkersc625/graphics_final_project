@@ -15,7 +15,7 @@ using namespace std;
 /*****************/
 
 Synth::Synth(Image i) :
-	sample(i), result(sideLength, sideLength, 1, 3) {}
+	sample(i), result(Image(sideLength, sideLength, 1, 3)) {}
 
 /***********************/
 /* Texture Methods */
@@ -28,9 +28,9 @@ Pixel Texture::getPixel(unsigned int x, unsigned int y)
 		return Pixel(0, 0, 0);
 	}
 	Pixel p;
-	p.r = image.data(x, y, 1, R);
-	p.g = image.data(x, y, 1, G);
-	p.b = image.data(x, y, 1, B);
+	p.r = (unsigned int)(*image.data(x, y, 1, R));
+	p.g = (unsigned int)(*image.data(x, y, 1, G));
+	p.b = (unsigned int)(*image.data(x, y, 1, B));
 	return p;
 }
 
@@ -43,7 +43,7 @@ Patch Texture::getPatch(int x, int y, int size)
 /* Patch Methods */
 /*****************/
 
-Pixel* Patch::getPixel(unsigned int x, unsigned int y)
+Pixel Patch::getPixel(unsigned int x, unsigned int y)
 {
 	if(x >= width || y >= width) {
 		printf("Invalid coordinates: %d, %d\n", x, y);
@@ -66,9 +66,7 @@ float Patch::difference(Patch& other)
 		for (int y = 0; y < width; y++) {
 			pixelA = getPixel(x, y);
 			pixelB = other.getPixel(x, y);
-			if(pixelA != nullptr && pixelB != nullptr) {
-				// TODO: DO THE THING
-			}
+			// TODO: DO THE THING
 		}
 	}
 }
