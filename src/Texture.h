@@ -4,60 +4,54 @@
 #include <vector>
 #include <string>
 
-#include <image.h>
 #include <GL/glew.h>
+#include <CImg/CImg.h>
+#include <glm/glm.hpp>
 
 using namespace std;
+using namespace cimg_library;
+using namespace glm;
 
 struct PixelBuffer;
 struct Patch;
 
-//For loading sample textures
-struct Texture {
-	Image image;
-	GLuint id;
+typedef CImg<unsigned char> Image;
+typedef uvec3 Pixel;
 
-	Texture(const string filepath);
+enum Colors {
+	R,
+	G,
+	B
 };
 
-//Color information only
-struct Pixel {
-	unsigned char r;
-	unsigned char g;
-	unsigned char b;
+struct Patch;
+
+struct Texture {
+	Image image;
+	Texture(Image i): image(i) {}
+	Pixel getPixel(unsigned int x, unsigned int y);
+	Patch getPatch(int offsetX, int offsetY, int size);
 };
 
 //Small sampling window for algorithm
 struct Patch {
-	PixelBuffer* sourceImage;
+	Texture* sourceImage;
 	unsigned int offsetX;
 	unsigned int offsetY;
 	unsigned int width;
-	Pixel* getPixel(unsigned int x, unsigned int y);
+	Pixel getPixel(unsigned int x, unsigned int y);
 	float difference(Patch& other);
-};
-
-//Self-explanatory
-struct PixelBuffer {
-	Pixel* data;
-	unsigned int width;
-
-	Pixel* getPixel(unsigned int x, unsigned int y);
-	Patch getPatchAround(unsigned int x, unsigned int y, unsigned int patchWidth);
 };
 
 //Full texture being generated
 class Synth {
 
-	Synth(Texture t);
-	~Synth();
+	Synth(Image t);
 
-	PixelBuffer sample;
-	PixelBuffer pixels;
+	Texture sample;
+	Texture result;
 
-	static constexpr int size = 750 * 750;
 	static constexpr int sideLength = 750;
-	static constexpr int sampleSize = 250 * 250;
 	static constexpr int sampleSideLength = 250;
 
 };

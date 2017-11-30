@@ -1,7 +1,6 @@
 #include "Texture.h"
 #include <iostream>
 #include <string>
-#include <jpegio.h>
 
 using namespace std;
 
@@ -9,56 +8,35 @@ using namespace std;
 /* Texture Methods */
 /*******************/
 
-Texture::Texture(const string filepath)
-{
-	if (!LoadJPEG(filepath, &image)) {
-		cout << "load image failed\n";
-	} else {
-		cout << "image loaded successfully\n";
-		printf("\timage width: %d\n", image.width);
-		printf("\timage height: %d\n", image.height);
-	}
-}
+// There's nothing here
 
 /*****************/
 /* Synth Methods */
 /*****************/
 
-Synth::Synth(Texture t)
-{
-	sample.data = (Pixel*) t.image.bytes.data();
-	sample.width = sampleSideLength;
-
-	pixels.data = new Pixel[size];
-	pixels.width = sideLength;
-}
-
-Synth::~Synth()
-{
-	delete[] pixels.data;
-}
+Synth::Synth(Image i) :
+	sample(i), result(sideLength, sideLength, 1, 3) {}
 
 /***********************/
-/* PixelBuffer Methods */
+/* Texture Methods */
 /***********************/
 
-Pixel* PixelBuffer::getPixel(unsigned int x, unsigned int y)
+Pixel Texture::getPixel(unsigned int x, unsigned int y)
 {
-	if(x >= width || y >= width) {
-		return nullptr;
+	if(x >= image.width() || y >= image.height()) {
+		printf("Invalid coordinates: %d, %d\n", x, y);
+		return Pixel(0, 0, 0);
 	}
-	unsigned int index = (y * width * sizeof(Pixel)) + (x  * sizeof(Pixel));
-	return &data[index];
+	Pixel p;
+	p.r = image.data(x, y, 1, R);
+	p.g = image.data(x, y, 1, G);
+	p.b = image.data(x, y, 1, B);
+	return p;
 }
 
-Patch PixelBuffer::getPatchAround(unsigned int x, unsigned int y, unsigned int patchWidth)
+Patch Texture::getPatch(int x, int y, int size)
 {
-	return Patch {
-		this,
-		x - patchWidth/2,
-		y - patchWidth/2,
-		patchWidth
-	};
+	return Patch {this, x, y, size};
 }
 
 /*****************/
@@ -67,8 +45,9 @@ Patch PixelBuffer::getPatchAround(unsigned int x, unsigned int y, unsigned int p
 
 Pixel* Patch::getPixel(unsigned int x, unsigned int y)
 {
-	if(x >= width || y >= width || sourceImage == nullptr) {
-		return nullptr;
+	if(x >= width || y >= width) {
+		printf("Invalid coordinates: %d, %d\n", x, y);
+		return Pixel(0, 0, 0);
 	}
 	return sourceImage->getPixel(x + offsetX, y + offsetY);
 }
@@ -81,8 +60,8 @@ float Patch::difference(Patch& other)
 	}
 
 	float diff = 0;
-	Pixel* pixelA;
-	Pixel* pixelB;
+	Pixel pixelA;
+	Pixel pixelB;
 	for (int x = 0; x < width; x++) {
 		for (int y = 0; y < width; y++) {
 			pixelA = getPixel(x, y);
