@@ -24,34 +24,34 @@ using namespace std;
 using namespace glm;
 using namespace cimg_library;
 
-const char* vertex_shader =
-#include "shaders/vertex_shader.vert"
-;
+// const char* vertex_shader =
+// #include "shaders/vertex_shader.vert"
+// ;
 
-const char* geometry_shader =
-#include "shaders/geometry_shader.geom"
-;
+// const char* geometry_shader =
+// #include "shaders/geometry_shader.geom"
+// ;
 
-const char* fragment_shader =
-#include "shaders/fragment_shader.frag"
-;
+// const char* fragment_shader =
+// #include "shaders/fragment_shader.frag"
+// ;
 
-
-
-void ErrorCallback(int error, const char* description)
-{
-	std::cerr << "GLFW Error: " << description << "\n";
-}
+// void ErrorCallback(int error, const char* description)
+// {
+// 	std::cerr << "GLFW Error: " << description << "\n";
+// }
 
 int main(int argc, char* argv[])
 {
 	Image i = Image("../assets/vintage.jpg");
-	CImgDisplay main_disp(i,"Sample texture");
-	while (!main_disp.is_closed()) {
-		main_disp.wait();
+	Synth synth(i, 3);
+	synth.synthesize();
+	CImgDisplay result_disp(synth.result.image,"Result texture");
+	CImgDisplay sample_disp(synth.sample.image,"Sample texture");
+	while (!sample_disp.is_closed() || !result_disp.is_closed()) {
 		// mouse and keyboard events?
     }
-  return 0;
+	return 0;
 
 	// Window w = Window();
 	// glfwSetErrorCallback(ErrorCallback);

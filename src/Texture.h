@@ -24,13 +24,17 @@ enum Colors {
 	B
 };
 
+static const Pixel error_pixel = Pixel(-1, -1, -1);
+
 struct Patch;
 
 struct Texture {
 	Image image;
-	Texture(Image i): image(i) {}
-	Pixel getPixel(unsigned int x, unsigned int y);
-	Patch getPatch(int offsetX, int offsetY, int size);
+	vector<vector<bool>> pixelsFilled;
+	Texture(Image i): image(i), pixelsFilled(i.width(), vector<bool>(i.height(), false)) {}
+	Pixel getPixel(unsigned int x, unsigned int y) const;
+	void setPixel(unsigned int x, unsigned int y, Pixel p);
+	Patch getPatch(unsigned int offsetX, unsigned int offsetY, unsigned int size);
 };
 
 //Small sampling window for algorithm
@@ -39,21 +43,26 @@ struct Patch {
 	unsigned int offsetX;
 	unsigned int offsetY;
 	unsigned int width;
-	Pixel getPixel(unsigned int x, unsigned int y);
-	float difference(Patch& other);
+	Pixel getPixel(unsigned int x, unsigned int y) const;
+	void setPixel(unsigned int x, unsigned int y, Pixel p);
+	float difference(const Patch& other) const;
 };
 
 //Full texture being generated
 class Synth {
-
-	Synth(Image t);
-
+private:
+	void placeSeed();
+public:
 	Texture sample;
 	Texture result;
+
+	unsigned int patchSize;
 
 	static constexpr int sideLength = 750;
 	static constexpr int sampleSideLength = 250;
 
+	Synth(Image i, unsigned int patchSize);
+	void synthesize();
 };
 
 #endif
