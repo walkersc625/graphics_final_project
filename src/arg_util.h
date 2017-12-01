@@ -10,6 +10,7 @@ void display_arg_list();
 bool parse_args(char *arg, char *buffer)
 {
 	if (not_valid_arg(arg)) {
+		printf("ERROR: Invalid texture name\n");
 		display_arg_list();
 		return false;
 	}
@@ -22,7 +23,20 @@ bool parse_args(char *arg, char *buffer)
 
 bool not_valid_arg(char *arg)
 {
-	return false;
+	return (strcmp(arg, "aqua_starburst"))
+	    && (strcmp(arg, "blue_lines"))
+	    && (strcmp(arg, "burlap"))
+	    && (strcmp(arg, "cactus"))
+	    && (strcmp(arg, "damask"))
+	    && (strcmp(arg, "diagonals"))
+	    && (strcmp(arg, "farfalle"))
+	    && (strcmp(arg, "fur"))
+	    && (strcmp(arg, "gray_cells"))
+	    && (strcmp(arg, "leather"))
+	    && (strcmp(arg, "noodles"))
+	    && (strcmp(arg, "rock"))
+	    && (strcmp(arg, "vintage"))
+	    && (strcmp(arg, "white_lines"));
 }
 
 void display_arg_list()

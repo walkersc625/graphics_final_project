@@ -42,7 +42,6 @@ int main(int argc, char* argv[])
 
 	char filepath[MAX_ARG_LENGTH];
 	if(!parse_args(argv[1], filepath)) {
-		printf("ERROR: Invalid texture name.\n");
 		return 0;
 	}
 
