@@ -13,6 +13,7 @@
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtx/io.hpp>
 #include <debuggl.h>
+#include <thread>
 
 #include "Texture.h"
 #include "arg_util.h"
@@ -21,7 +22,15 @@
 
 #define MAX_ARG_LENGTH 100
 
+using namespace std;
 using namespace cimg_library;
+
+void runProgram(Synth* synth) {
+	synth->synthesize();
+}
+
+//handlers
+//http://cimg.eu/reference/structcimg__library_1_1CImgDisplay.html
 
 int main(int argc, char* argv[])
 {
@@ -40,8 +49,9 @@ int main(int argc, char* argv[])
 
 	/* synthesize texture */
 	Image i = Image(filepath);
-	Synth synth(i, 3);
-	synth.synthesize();
+	Synth synth(i, 5);
+	// thread synthThread(runProgram, &synth);
+	runProgram(&synth);
 
 	/* display sample and result images */
 	CImgDisplay result_disp(synth.result.image,"Result texture");
@@ -49,6 +59,7 @@ int main(int argc, char* argv[])
 
 	/* poll for mouse or keyboard interrupts */
 	while (!sample_disp.is_closed() || !result_disp.is_closed()) {
+		result_disp.assign(synth.sample.image, "Sample texture");
 		// mouse and keyboard events?
     }
 

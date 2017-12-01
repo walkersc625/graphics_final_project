@@ -35,14 +35,14 @@ struct Texture {
 		vector<bool>(i.height(), false)) {}
 	Pixel getPixel(uint x, uint y) const;
 	void setPixel(uint x, uint y, Pixel p);
-	Patch getPatch(uint offsetX, uint offsetY, uint size);
+	Patch getPatch(int offsetX, int offsetY, uint size);
 };
 
 //Small sampling window for algorithm
 struct Patch {
 	Texture* sourceImage;
-	uint offsetX;
-	uint offsetY;
+	int offsetX;
+	int offsetY;
 	uint width;
 	Pixel getPixel(uint x, uint y) const;
 	Pixel getCenterPixel() const;
@@ -61,7 +61,7 @@ public:
 
 	uint patchSize; // size n means an n^2 pxel patch
 
-	static constexpr int sideLength = 750;
+	static constexpr int sideLength = 250;
 	static constexpr int sampleSideLength = 250;
 
 	Synth(Image i, uint patchSize);

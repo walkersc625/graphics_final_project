@@ -14,7 +14,8 @@ Pixel Texture::getPixel(uint x, uint y) const
 {
 	if(x >= (uint)image.width() || y >= (uint)image.height() || 
 											!pixelsFilled[x][y]) {
-		printf("Invalid coordinates: %d, %d\n", x, y);
+		// printf("getPixel in texture\n");
+		// printf("Invalid coordinates: %d, %d\n", x, y);
 		return error_pixel;
 	}
 	Pixel p;
@@ -27,6 +28,7 @@ Pixel Texture::getPixel(uint x, uint y) const
 void Texture::setPixel(uint x, uint y, Pixel p)
 {
 	if (x >= (uint) image.width() || y >= (uint) image.height()) {
+		// printf("setPixel in texture\n");
 		printf("Invalid coordinates: %d, %d\n", x, y);
 	}
 	pixelsFilled[x][y] = true;
@@ -35,7 +37,7 @@ void Texture::setPixel(uint x, uint y, Pixel p)
 	image(x, y, 0, B) = (unsigned char)p.b;
 }
 
-Patch Texture::getPatch(uint x, uint y, uint size)
+Patch Texture::getPatch(int x, int y, uint size)
 {
 	return Patch {this, x, y, size};
 }
@@ -47,6 +49,7 @@ Patch Texture::getPatch(uint x, uint y, uint size)
 Pixel Patch::getPixel(uint x, uint y) const
 {
 	if (x >= width || y >= width) {
+		// printf("getPixel in patch\n");
 		printf("Invalid coordinates: %d, %d\n", x, y);
 		return error_pixel;
 	}
@@ -55,12 +58,13 @@ Pixel Patch::getPixel(uint x, uint y) const
 
 Pixel Patch::getCenterPixel() const
 {
-	return sourceImage->getPixel(1 + offsetX, 1 + offsetY);
+	return getPixel(width/2, width/2);
 }
 
 void Patch::setPixel(uint x, uint y, Pixel p)
 {
 	if (x >= width || y >= width) {
+		// printf("setPixel in patch\n");
 		printf("Invalid coordinates: %d, %d\n", x, y);
 	}
 	sourceImage->setPixel(x + offsetX, y + offsetY, p);
@@ -91,6 +95,7 @@ float Patch::difference(const Patch& other) const
 			pixelA = getPixel(x, y);
 			pixelB = other.getPixel(x, y);
 			if (pixelA != error_pixel && pixelB != error_pixel) {
+				// cout << "pixel not invalid\n";
 				diff += l1Norm(pixelA, pixelB);
 				pixelCount++;
 			}
@@ -119,8 +124,9 @@ void Synth::synthesize()
 	uint a = patchSize;
 	uint b = 0;
 	while (a < sideLength) {
-		//assignColor(a,b);
-		//assignColor(b,a);
+		printf("a = %d, b = %d\n", a, b);
+		assignColor(a,b);
+		assignColor(b,a);
 		b++;
 		if (b == a) {
 			a++;
@@ -132,6 +138,7 @@ void Synth::synthesize()
 //Copies a randomly chosen seed patch from sample to bottom left result.
 void Synth::placeSeed()
 {
+	srand(time(NULL));
 	uint randX = rand() % (sampleSideLength - patchSize);
 	uint randY = rand() % (sampleSideLength - patchSize);
 	uint resZ = sideLength/2 - patchSize/2;
@@ -152,31 +159,40 @@ void Synth::placeSeed()
 void Synth::assignColor(uint a, uint b)
 {
 	//result patch at (a, b)
-	Patch res = result.getPatch(a, b, patchSize);
+	Patch res = result.getPatch(a - patchSize/2, b - patchSize / 2, patchSize);
 
 	//vector to store differences
 	uint sampleSize = powf(sampleSideLength, 2);
 	vector<pair<float, pair<uint, uint>>> diffs;
-	diffs.reserve(sampleSize);
+
+	// cout << "AssignColor: about to start loop\n";
 
 	//get differences from all sample patches
 	Patch sam;
-	for (uint i = 0; i < sampleSideLength; i++) {
-		for (uint j = 0; j < sampleSideLength; j++) {
+	for (uint i = 0; i < sampleSideLength - patchSize; i++) {
+		for (uint j = 0; j < sampleSideLength - patchSize; j++) {
 			sam = sample.getPatch(i, j, patchSize);
 			float diff = res.difference(sam);
-			diffs.push_back(make_pair(diff, make_pair(i, j)));
+			if(diffs.size() <= 5) {
+				diffs.push_back(make_pair(diff, make_pair(i, j)));
+			} else {
+				diffs[6] = make_pair(diff, make_pair(i, j));
+				sort(begin(diffs), end(diffs));
+			}
 		}
 	}
 
+	// cout << "done looping, now sorting\n";
+
 	//choose patch at random from smallest differences
-	sort(begin(diffs), end(diffs));
 	srand(time(NULL));
 	pair<float, pair<uint, uint>> chosenDiff = diffs[rand() % 6];
+
+	// cout << "done sorting\n";
 
 	//color pixel (a, b) of result from chosen patch
 	uint x = chosenDiff.second.first;
 	uint y = chosenDiff.second.second;
 	sam = sample.getPatch(x, y, patchSize);
-	res.setPixel(1, 1, sam.getCenterPixel());
+	res.setPixel(patchSize/2, patchSize/2, sam.getCenterPixel());
 }

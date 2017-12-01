@@ -1,5 +1,7 @@
-
 #include <string>
+#include <iostream>
+
+using namespace std;
 
 bool not_valid_arg(char *arg);
 void display_arg_list();
@@ -25,5 +27,19 @@ bool not_valid_arg(char *arg)
 
 void display_arg_list()
 {
-	return;
+	cout << "Available textures: \n"
+	     << "\taqua_starburst\n"
+	     << "\tblue_lines\n"
+	     << "\tburlap\n"
+	     << "\tcactus\n"
+	     << "\tdamask\n"
+	     << "\tdiagonals\n"
+	     << "\tfarfalle\n"
+	     << "\tfur\n"
+	     << "\tgray_cells\n"
+	     << "\tleather\n"
+	     << "\tnoodles\n"
+	     << "\trock\n"
+	     << "\tvintage\n"
+	     << "\twhite_lines\n";
 }
