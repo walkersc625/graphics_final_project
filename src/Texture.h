@@ -45,6 +45,7 @@ struct Patch {
 	uint offsetY;
 	uint width;
 	Pixel getPixel(uint x, uint y) const;
+	Pixel getCenterPixel() const;
 	void setPixel(uint x, uint y, Pixel p);
 	void copyPatch(Patch& src);
 	float difference(const Patch& other) const;
@@ -58,13 +59,14 @@ public:
 	Texture sample;
 	Texture result;
 
-	uint patchSize;
+	uint patchSize; // size n means an n^2 pxel patch
 
 	static constexpr int sideLength = 750;
 	static constexpr int sampleSideLength = 250;
 
 	Synth(Image i, uint patchSize);
 	void synthesize();
+	void assignColor(uint a, uint b);
 };
 
 #endif
