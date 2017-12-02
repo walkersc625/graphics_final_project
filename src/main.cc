@@ -48,16 +48,10 @@ int main(int argc, char* argv[])
 
 	/* synthesize texture */
 	Image i = Image(filepath);
-<<<<<<< HEAD
 
 	// Have patchsize always be odd for simplicity
-	Synth synth(i, 3);
-	// thread synthThread(runProgram, &synth);
-	runProgram(&synth);
-=======
 	Synth synth(i, 5);
-        synth.synthesize();
->>>>>>> 72eaafd06fdab165687ff09318b9fe495f21cb9c
+    synth.synthesize();
 
 	/* display sample and result images */
 	CImgDisplay result_disp(synth.result.image,"Result texture");

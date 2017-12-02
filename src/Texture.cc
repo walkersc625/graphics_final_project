@@ -81,6 +81,15 @@ void Patch::copyPatch(Patch& src)
 	}
 }
 
+// l1_Norm wasn't working because of unsigned issues
+inline float pixel_L1Norm(Pixel pixelA, Pixel pixelB) {
+	float d = 0;
+	d += pixelA.x - pixelB.x < 256 ? pixelA.x-pixelB.x : pixelB.x-pixelA.x;
+	d += pixelA.y - pixelB.y < 256 ? pixelA.y-pixelB.y : pixelB.y-pixelA.y;
+	d += pixelA.z - pixelB.z < 256 ? pixelA.z-pixelB.z : pixelB.z-pixelA.z;
+	return d;
+}
+
 float Patch::difference(const Patch& other) const
 {
 	if (other.width != width) {
@@ -93,39 +102,21 @@ float Patch::difference(const Patch& other) const
 	Pixel pixelA;
 	Pixel pixelB;
 
-	// If you already know how many pixels are valid
-	if(countedPixels) {
-		for(pair<int,int> p : validPixels) {
+	// Otherwise go through whole patch and store for later
+	
+	for (int x = 0; x < width; x++) {
+		for (int y = 0; y < width; y++) {
 			pixelA = getPixel(x, y);
 			pixelB = other.getPixel(x, y);
-			diff += pixel_L1Norm(pixelA, pixelB);
-		}
-
-	// Otherwise go through whole patch and store for later
-	} else {
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < width; y++) {
-				pixelA = getPixel(x, y);
-				pixelB = other.getPixel(x, y);
-				if (pixelA != error_pixel && pixelB != error_pixel) {
-					validPixels.push_back(make_pair(x,y));
-					diff += pixel_L1Norm(pixelA, pixelB);
-					checkedPixels = true;
-				}
+			if (pixelA != error_pixel && pixelB != error_pixel) {
+				diff += pixel_L1Norm(pixelA, pixelB);
+				pixelCount++;
 			}
 		}
 	}
 	
-	return diff / validPixels.size();
-}
-
-// l1_Norm wasn't working because of unsigned issues
-inline float pixel_L1Norm(Pixel pixelA, Pixel pixelB) {
-	float d = 0;
-	d += pixelA.x - pixelB.x < 256 ? pixelA.x-pixelB.x : pixelB.x-pixelA.x;
-	d += pixelA.y - pixelB.y < 256 ? pixelA.y-pixelB.y : pixelB.y-pixelA.y;
-	d += pixelA.z - pixelB.z < 256 ? pixelA.z-pixelB.z : pixelB.z-pixelA.z;
-	return d;
+	
+	return diff / pixelCount;
 }
 
 /*****************/
