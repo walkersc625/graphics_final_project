@@ -48,7 +48,9 @@ int main(int argc, char* argv[])
 
 	/* synthesize texture */
 	Image i = Image(filepath);
-	Synth synth(i, 5);
+
+	// Have patchsize always be odd for simplicity
+	Synth synth(i, 3);
 	// thread synthThread(runProgram, &synth);
 	runProgram(&synth);
 

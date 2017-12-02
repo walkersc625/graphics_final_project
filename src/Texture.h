@@ -33,9 +33,9 @@ struct Texture {
 	vector<vector<bool>> pixelsFilled;
 	Texture(Image i): image(i), pixelsFilled(i.width(),
 		vector<bool>(i.height(), false)) {}
-	Pixel getPixel(uint x, uint y) const;
-	void setPixel(uint x, uint y, Pixel p);
-	Patch getPatch(int offsetX, int offsetY, uint size);
+	Pixel getPixel(int x, int y) const;
+	void setPixel(int x, int y, Pixel p);
+	Patch getPatch(int offsetX, int offsetY, int size);
 };
 
 //Small sampling window for algorithm
@@ -43,10 +43,10 @@ struct Patch {
 	Texture* sourceImage;
 	int offsetX;
 	int offsetY;
-	uint width;
-	Pixel getPixel(uint x, uint y) const;
+	int width;
+	Pixel getPixel(int x, int y) const;
 	Pixel getCenterPixel() const;
-	void setPixel(uint x, uint y, Pixel p);
+	void setPixel(int x, int y, Pixel p);
 	void copyPatch(Patch& src);
 	float difference(const Patch& other) const;
 };
@@ -54,17 +54,18 @@ struct Patch {
 //Full texture being generated
 class Synth {
 private:
+	bool sanityChecks();
 	void placeSeed();
 public:
 	Texture sample;
 	Texture result;
 
-	uint patchSize; // size n means an n^2 pxel patch
+	int patchSize; // size n means an n^2 pxel patch
 
 	static constexpr int sideLength = 250;
 	static constexpr int sampleSideLength = 250;
 
-	Synth(Image i, uint patchSize);
+	Synth(Image i, int patchSize);
 	void synthesize();
 	void assignColor(uint a, uint b);
 };
