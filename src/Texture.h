@@ -44,6 +44,8 @@ struct Patch {
 	int offsetX;
 	int offsetY;
 	int width;
+	bool checkPixels = false;
+	vector<pair<int, int>> validPixels;
 	Pixel getPixel(int x, int y) const;
 	Pixel getCenterPixel() const;
 	void setPixel(int x, int y, Pixel p);
