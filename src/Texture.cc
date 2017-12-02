@@ -3,6 +3,7 @@
 #include <string>
 #include <glm/gtx/norm.hpp>
 #include <cstdlib>
+#include <cmath>
 
 using namespace std;
 
@@ -86,17 +87,22 @@ float Patch::difference(const Patch& other) const
 		return -1;
 	}
 
-	float diff = 0;
+	uint diff = 0;
 	int pixelCount = 0;
 	Pixel pixelA;
 	Pixel pixelB;
+        uint r_diff;
+        uint g_diff;
+        uint b_diff;
 	for (uint x = 0; x < width; x++) {
 		for (uint y = 0; y < width; y++) {
 			pixelA = getPixel(x, y);
 			pixelB = other.getPixel(x, y);
 			if (pixelA != error_pixel && pixelB != error_pixel) {
-				// cout << "pixel not invalid\n";
-				diff += l1Norm(pixelA, pixelB);
+                                r_diff = abs((int)pixelA.r - (int)pixelB.r);
+                                g_diff = abs((int)pixelA.g - (int)pixelB.g);
+                                b_diff = abs((int)pixelA.b - (int)pixelB.b);
+				diff += r_diff + g_diff + b_diff;
 				pixelCount++;
 			}
 		}
@@ -129,6 +135,7 @@ void Synth::synthesize()
 		assignColor(b,a);
 		b++;
 		if (b == a) {
+		        assignColor(a,a);
 			a++;
 			b=0;
 		}
@@ -184,9 +191,28 @@ void Synth::assignColor(uint a, uint b)
 
 	// cout << "done looping, now sorting\n";
 
-	//choose patch at random from smallest differences
+        // "similarity measure" is 100/difference
+        // find sum of similarities
+        float similaritySum = 0;
+        for(int i = 0; i < 5; i++) {
+            pair<float, pair<uint, uint>> candidate = diffs[i];
+            similaritySum += 100.0 / candidate.first;
+        }
+
+        // Select patch with probability proportional to its similarity
 	srand(time(NULL));
-	pair<float, pair<uint, uint>> chosenDiff = diffs[rand() % 6];
+        float r = (float)rand() * (similaritySum / RAND_MAX);
+	pair<float, pair<uint, uint>> chosenDiff;
+        float similarity;
+        for(int i = 0; i < 5; i++) {
+            pair<float, pair<uint, uint>> candidate = diffs[i];
+            similarity = 100.0 / candidate.first;
+            if(r <= similarity) {
+                chosenDiff = candidate;
+                break;
+            }
+            r -= similarity;
+        }
 
 	// cout << "done sorting\n";
 
