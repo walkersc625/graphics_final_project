@@ -189,8 +189,6 @@ void Synth::assignColor(uint a, uint b)
 	uint sampleSize = powf(sampleSideLength, 2);
 	vector<pair<float, pair<uint, uint>>> diffs;
 
-	// cout << "AssignColor: about to start loop\n";
-
 	//get differences from all sample patches
 	Patch sam;
 	for (int i = 0; i < sampleSideLength - patchSize; i++) {
@@ -200,38 +198,34 @@ void Synth::assignColor(uint a, uint b)
 			if(diffs.size() <= 5) {
 				diffs.push_back(make_pair(diff, make_pair(i, j)));
 			} else {
-				diffs[6] = make_pair(diff, make_pair(i, j));
+				diffs[5] = make_pair(diff, make_pair(i, j));
 				sort(begin(diffs), end(diffs));
 			}
 		}
 	}
 
-	// cout << "done looping, now sorting\n";
+	// "similarity measure" is 100/difference
+	// find sum of similarities
+	float similaritySum = 0;
+	for(int i = 0; i < 5; i++) {
+		pair<float, pair<uint, uint>> candidate = diffs[i];
+		similaritySum += 100.0 / candidate.first;
+	}
 
-        // "similarity measure" is 100/difference
-        // find sum of similarities
-        float similaritySum = 0;
-        for(int i = 0; i < 5; i++) {
-            pair<float, pair<uint, uint>> candidate = diffs[i];
-            similaritySum += 100.0 / candidate.first;
-        }
-
-        // Select patch with probability proportional to its similarity
+	// Select patch with probability proportional to its similarity
 	srand(time(NULL));
-        float r = (float)rand() * (similaritySum / RAND_MAX);
+	float r = (float)rand() * (similaritySum / RAND_MAX);
 	pair<float, pair<uint, uint>> chosenDiff;
-        float similarity;
-        for(int i = 0; i < 5; i++) {
-            pair<float, pair<uint, uint>> candidate = diffs[i];
-            similarity = 100.0 / candidate.first;
-            if(r <= similarity) {
-                chosenDiff = candidate;
-                break;
-            }
-            r -= similarity;
-        }
-
-	// cout << "done sorting\n";
+	float similarity;
+	for(int i = 0; i < 5; i++) {
+		pair<float, pair<uint, uint>> candidate = diffs[i];
+		similarity = 100.0 / candidate.first;
+		if(r <= similarity) {
+			chosenDiff = candidate;
+			break;
+		}
+		r -= similarity;
+	}
 
 	//color pixel (a, b) of result from chosen patch
 	uint x = chosenDiff.second.first;

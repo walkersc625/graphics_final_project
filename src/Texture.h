@@ -62,7 +62,7 @@ public:
 
 	int patchSize; // size n means an n^2 pxel patch
 
-	static constexpr int sideLength = 250;
+	static constexpr int sideLength = 750;
 	static constexpr int sampleSideLength = 250;
 
 	Synth(Image i, int patchSize);
