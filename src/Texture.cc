@@ -98,25 +98,33 @@ float Patch::difference(const Patch& other) const
 	}
 
 	uint diff = 0;
-	int pixelCount = 0;
 	Pixel pixelA;
 	Pixel pixelB;
 
 	// Otherwise go through whole patch and store for later
 	
-	for (int x = 0; x < width; x++) {
-		for (int y = 0; y < width; y++) {
-			pixelA = getPixel(x, y);
-			pixelB = other.getPixel(x, y);
-			if (pixelA != error_pixel && pixelB != error_pixel) {
-				diff += pixel_L1Norm(pixelA, pixelB);
-				pixelCount++;
-			}
-		}
+	for(pair<int,int> p : validPixels){
+			pixelA = getPixel(p.first, p.second);
+			pixelB = other.getPixel(p.first, p.second);
+			diff += pixel_L1Norm(pixelA, pixelB);
 	}
 	
 	
-	return diff / pixelCount;
+	return diff / validPixels.size();
+}
+
+void Patch::fillValidPixels()
+{
+	for(int i =0; i<width; i++){
+		for(int j=0; j<width; j++){
+			if(i+offsetX >= 0 && i+offsetX < sourceImage->image.width() &&
+				j+offsetY >= 0 && j+offsetY < sourceImage->image.height()) {
+				if(sourceImage->pixelsFilled[i+offsetX][j+offsetY]) {
+					validPixels.push_back(make_pair(i,j));
+				}
+			}
+		}
+	}
 }
 
 /*****************/
@@ -184,6 +192,7 @@ void Synth::assignColor(uint a, uint b)
 {
 	//result patch with (x, y) as center pixel
 	Patch res = result.getPatch(a - patchSize/2, b - patchSize / 2, patchSize);
+	res.fillValidPixels();
 
 	//vector to store differences
 	uint sampleSize = powf(sampleSideLength, 2);

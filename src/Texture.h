@@ -44,11 +44,13 @@ struct Patch {
 	int offsetX;
 	int offsetY;
 	int width;
+	vector<pair<int, int>> validPixels;
 	Pixel getPixel(int x, int y) const;
 	Pixel getCenterPixel() const;
 	void setPixel(int x, int y, Pixel p);
 	void copyPatch(Patch& src);
 	float difference(const Patch& other) const;
+	void fillValidPixels();
 };
 
 //Full texture being generated
