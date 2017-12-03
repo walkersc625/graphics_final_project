@@ -50,8 +50,8 @@ int main(int argc, char* argv[])
 	Image i = Image(filepath);
 
 	// Have patchsize always be odd for simplicity
-	Synth synth(i, 5);
-    synth.synthesize();
+	Synth synth(i, 9);
+    thread synthThread(runProgram, &synth);
 
 	/* display sample and result images */
 	CImgDisplay result_disp(synth.result.image,"Result texture");
@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
 
 	/* poll for mouse or keyboard interrupts */
 	while (!sample_disp.is_closed() || !result_disp.is_closed()) {
-		// mouse and keyboard events?
+		result_disp.display(synth.result.image);
     }
 
 	return 0;
