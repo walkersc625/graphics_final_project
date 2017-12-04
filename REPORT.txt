@@ -13,6 +13,8 @@ Implementation Details:
 
 The algorithm we are using synthesizes texture by starting with a small sample from the source jpg. For each pixel in the result image not yet filled in, we look at that pixel's neighborhood (within a given square patch size) and find the five patches in the source image that are most similar to that patch (where we measure the difference as the sum of each pixel's difference with the corresponding pixel in the other image). We choose between each of these patches with probability inversely proportional to its difference, and fill in the pixel in the result image with the color of the pixel at the center of that patch.
 
-We have currently implemented the algorithm naively, and it runs extremely slow. We are considering using some kind of acceleration structure to speed the process of finding the most similar 
+We have currently implemented the algorithm naively, and it runs extremely slow. We are considering using some kind of acceleration structure to speed the process of finding the most similar patches for the neighborhood of a pixel.
 
 Plan for Project Completion:
+
+From this point, we plan to focus on either speeding up our implementation of texture synthesis or move on to implementing perlin noise for texture blending.
