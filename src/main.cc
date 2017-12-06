@@ -51,12 +51,14 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
+	bool small = (!strcmp(sizeFlag, "-s"));
 
 	/* synthesize texture */
 	Image i = Image(filepath);
 
 	// Have patchsize always be odd for simplicity
-	Synth synth(i, atoi(argv[2]));
+	Synth synth(i, atoi(argv[2]), small);
+	synth.sideLength = 250;
     thread synthThread(runProgram, &synth);
 
 	/* display sample and result images */

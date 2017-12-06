@@ -67,7 +67,7 @@ public:
 	Texture sample;
 	Texture result;
 
-	Synth(Image i, int patchSize);
+	Synth(Image i, int patchSize, bool small);
 	void synthesize();
 	void assignColor(uint a, uint b);
 };

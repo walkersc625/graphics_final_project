@@ -131,12 +131,17 @@ void Patch::fillValidPixels()
 /* Synth Methods */
 /*****************/
 
-Synth::Synth(Image i, int patchSize) :
-		sample(i), result(Image(sideLength, sideLength, 1, 3)), 
+Synth::Synth(Image i, int patchSize, bool small) :
+		sample(i), result(Image()),
 		patchSize{patchSize}, sampleSideLength{i.width()}
 {
 	sample.pixelsFilled =
 		vector<vector<bool>>(sideLength, vector<bool>(sideLength, true));
+	if (small) {
+		sideLength = 250;
+	}
+
+	result = Image(sideLength, sideLength, 1, 3);
 }
 
 void Synth::synthesize()
