@@ -18,9 +18,9 @@ bool parse_args(char *arg, char* flag, char *buffer)
 	if (flag != NULL) {
 		if (!strcmp(flag, "-s")) {
 			strcpy(buffer, "../assets/tiny/");
-		} else {
-			strcpy(buffer, "../assets/");
 		}
+	} else {
+		strcpy(buffer, "../assets/");
 	}
 
 	strcat(buffer, arg);
