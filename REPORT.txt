@@ -7,14 +7,36 @@ Sam Walker (scw2257)
 
 Current Progress:
 
-So far we have implemented the texture synthesis algorithm in the Efros and Leung paper. Currently, we have created a program that takes in the name of a square .jpg file and creates two windows, one which shows the source image and one showing the resulting image as it is being synthesized. Our program runs very slowly, but produces reasonable results. We have been all programming together for most of this project, so it is difficult to separate out what we have each worked on. Kelsey worked on loading and reading the images, sam worked on reading and processing command-line inputs, and Elena did a lot of debugging work. For the actual algorithm, we worked together for the most part and each worked on different bits and pieces.
+So far we have implemented the texture synthesis algorithm in the Efros and
+Leung paper. Currently, we have created a program that takes in the name of a
+square .jpg file and creates two windows, one which shows the source image and
+one showing the resulting image as it is being synthesized. Our program runs
+very slowly, but produces reasonable results. We have been all programming
+together for most of this project, so it is difficult to separate out what we
+have each worked on. Kelsey worked on loading and reading the images, sam
+worked on reading and processing command-line inputs, and Elena did a lot of
+debugging work. For the actual algorithm, we worked together for the most part
+and each worked on different bits and pieces.
 
 Implementation Details:
 
-The algorithm we are using synthesizes texture by starting with a small sample from the source jpg. For each pixel in the result image not yet filled in, we look at that pixel's neighborhood (within a given square patch size) and find the five patches in the source image that are most similar to that patch (where we measure the difference as the sum of each pixel's difference with the corresponding pixel in the other image). We choose between each of these patches with probability inversely proportional to its difference, and fill in the pixel in the result image with the color of the pixel at the center of that patch.
+The algorithm we are using synthesizes texture by starting with a small sample
+from the source jpg. For each pixel in the result image not yet filled in, we
+look at that pixel's neighborhood (within a given square patch size) and find
+the five patches in the source image that are most similar to that patch
+(where we measure the difference as the sum of each pixel's difference with
+the corresponding pixel in the other image). We choose between each of these
+patches with probability inversely proportional to its difference, and fill in
+the pixel in the result image with the color of the pixel at the center of
+that patch.
 
-We have currently implemented the algorithm naively, and it runs extremely slow. We are considering using some kind of acceleration structure to speed the process of finding the most similar patches for the neighborhood of a pixel.
+We have currently implemented the algorithm naively, and it runs extremely
+slow. We are considering using some kind of acceleration structure to speed
+the process of finding the most similar patches for the neighborhood of a
+pixel.
 
 Plan for Project Completion:
 
-From this point, we plan to focus on either speeding up our implementation of texture synthesis or move on to implementing perlin noise for texture blending.
+From this point, we plan to focus on either speeding up our implementation of
+texture synthesis or move on to implementing perlin noise for texture
+blending.
