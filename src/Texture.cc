@@ -133,7 +133,7 @@ void Patch::fillValidPixels()
 
 Synth::Synth(Image i, int patchSize) :
 		sample(i), result(Image(sideLength, sideLength, 1, 3)), 
-		patchSize{patchSize}
+		patchSize{patchSize}, sampleSideLength{i.width()}
 {
 	sample.pixelsFilled =
 		vector<vector<bool>>(sideLength, vector<bool>(sideLength, true));
@@ -147,7 +147,7 @@ void Synth::synthesize()
 	uint a = patchSize;
 	uint b = 0;
 	while (a < sideLength) {
-		printf("a = %d, b = %d\n", a, b);
+		//printf("a = %d, b = %d\n", a, b);
 		assignColor(a,b);
 		assignColor(b,a);
 		b++;

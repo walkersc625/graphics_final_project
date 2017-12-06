@@ -59,13 +59,13 @@ private:
 	bool sanityChecks();
 	void placeSeed();
 public:
-	Texture sample;
-	Texture result;
-
 	int patchSize; // size n means an n^2 pxel patch
 
-	static constexpr int sideLength = 750;
-	static constexpr int sampleSideLength = 250;
+	int sideLength = 750;
+	int sampleSideLength;
+
+	Texture sample;
+	Texture result;
 
 	Synth(Image i, int patchSize);
 	void synthesize();

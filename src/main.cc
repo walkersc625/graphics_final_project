@@ -7,6 +7,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <cstdlib>
 
 #include <glm/gtx/component_wise.hpp>
 #include <glm/gtx/rotate_vector.hpp>
@@ -27,6 +28,7 @@ using namespace cimg_library;
 
 void runProgram(Synth* synth) {
 	synth->synthesize();
+	printf("Done!");
 }
 
 //handlers
@@ -34,14 +36,18 @@ void runProgram(Synth* synth) {
 
 int main(int argc, char* argv[])
 {
+	char* textureName = argv[1];
+	char* patchSize = argv[2];
+	char* sizeFlag = argv[3];
+
 	/* parse argument */
-	if (argv[1] == NULL) {
-		printf("ERROR: Texture name required.\n");
+	if (textureName == NULL || patchSize == NULL) {
+		printf("ERROR: Texture name and patch size required.\n");
 		return 0;
 	}
 
 	char filepath[MAX_ARG_LENGTH];
-	if(!parse_args(argv[1], filepath)) {
+	if(!parse_args(textureName, sizeFlag, filepath)) {
 		return 0;
 	}
 
@@ -50,7 +56,7 @@ int main(int argc, char* argv[])
 	Image i = Image(filepath);
 
 	// Have patchsize always be odd for simplicity
-	Synth synth(i, 9);
+	Synth synth(i, atoi(argv[2]));
     thread synthThread(runProgram, &synth);
 
 	/* display sample and result images */
