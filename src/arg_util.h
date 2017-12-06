@@ -7,7 +7,7 @@ bool not_valid_arg(char *arg);
 void display_arg_list();
 
 
-bool parse_args(char *arg, char *buffer)
+bool parse_args(char *arg, char* flag, char *buffer)
 {
 	if (not_valid_arg(arg)) {
 		printf("ERROR: Invalid texture name\n");
@@ -15,7 +15,14 @@ bool parse_args(char *arg, char *buffer)
 		return false;
 	}
 
-	strcpy(buffer, "../assets/");
+	if (flag != NULL) {
+		if (!strcmp(flag, "-s")) {
+			strcpy(buffer, "../assets/tiny/");
+		} else {
+			strcpy(buffer, "../assets/");
+		}
+	}
+
 	strcat(buffer, arg);
 	strcat(buffer, ".jpg");
 	return true;
@@ -31,6 +38,7 @@ bool not_valid_arg(char *arg)
 	    && (strcmp(arg, "diagonals"))
 	    && (strcmp(arg, "farfalle"))
 	    && (strcmp(arg, "fur"))
+	    && (strcmp(arg, "green_cells"))
 	    && (strcmp(arg, "gray_cells"))
 	    && (strcmp(arg, "leather"))
 	    && (strcmp(arg, "noodles"))

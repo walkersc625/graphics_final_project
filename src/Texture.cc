@@ -139,7 +139,7 @@ void Synth::synthesize()
 	uint a = patchSize;
 	uint b = 0;
 	while (a < sideLength) {
-		printf("a = %d, b = %d\n", a, b);
+		//printf("a = %d, b = %d\n", a, b);
 		assignColor(a,b);
 		assignColor(b,a);
 		b++;
