@@ -131,17 +131,23 @@ void Patch::fillValidPixels()
 /* Synth Methods */
 /*****************/
 
-Synth::Synth(Image i, int patchSize, bool small) :
+Synth::Synth(Image i, int patchSize, bool small, int resultSideLength) :
 		sample(i), result(Image()),
 		patchSize{patchSize}, sampleSideLength{i.width()}
 {
-	sample.pixelsFilled =
-		vector<vector<bool>>(sideLength, vector<bool>(sideLength, true));
 	if (small) {
-		sideLength = 250;
+		resultSideLength = 128;
+		if (patchSize > 128) {
+			patchSize = 127;
+		}
 	}
 
-	result = Image(sideLength, sideLength, 1, 3);
+	sideLength = resultSideLength;
+
+	sample.pixelsFilled =
+		vector<vector<bool>>(sampleSideLength, vector<bool>(sampleSideLength, true));
+
+	result = Texture(Image(resultSideLength, resultSideLength, 1, 3));
 }
 
 void Synth::synthesize()
@@ -152,12 +158,12 @@ void Synth::synthesize()
 	int a = patchSize;
 	int b = 0;
 	while (a < sideLength) {
-		//printf("a = %d, b = %d\n", a, b);
+		// printf("a = %d, b = %d\n", a, b);
 		assignColor(a,b);
 		assignColor(b,a);
 		b++;
 		if (b == a) {
-		        assignColor(a,a);
+			assignColor(a,a);
 			a++;
 			b=0;
 		}
@@ -170,6 +176,13 @@ bool Synth::sanityChecks()
 		printf("Error patchsize %d is greater than sampleSize %d\n", patchSize, sampleSideLength);
 		return false;
 	}
+	if(patchSize > sideLength) {
+		printf("Error patchsize %d is greater than result size %d\n", patchSize, sideLength);
+		return false;
+	}
+	if(sideLength < sampleSideLength) {
+		printf("Result size %d is smaller than sample size %d (not an error but you're weird)\n", sideLength, sampleSideLength);
+	}
 	return true;
 }
 //Copies a randomly chosen seed patch from sample to (0,0) of result.
@@ -178,7 +191,6 @@ void Synth::placeSeed()
 	srand(time(NULL));
 	uint randX = rand() % (sampleSideLength - patchSize);
 	uint randY = rand() % (sampleSideLength - patchSize);
-	uint resZ = sideLength/2 - patchSize/2;
 
 	cout << "randX: " << randX << endl;
 	cout << "randY: " << randY << endl;

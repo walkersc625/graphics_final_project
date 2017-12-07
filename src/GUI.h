@@ -12,10 +12,12 @@
 struct GUI {
  	Fl_Window* mainWindow;
    	Fl_Value_Slider* patchSizeSlider;
+   	Fl_Value_Slider* resultSizeSlider;
 //   	Fl_Check_Button* centerCheckButton;
    	Fl_File_Chooser* fileChooser;
  	GUI();
- 	int run();
+ 	~GUI();
+ 	char* run();
 };
 
 #endif

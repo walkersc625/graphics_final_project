@@ -61,13 +61,15 @@ private:
 public:
 	int patchSize; // size n means an n^2 pxel patch
 
-	int sideLength = 750;
+	int sideLength = 512;
 	int sampleSideLength;
 
 	Texture sample;
 	Texture result;
 
-	Synth(Image i, int patchSize, bool small);
+	Synth() = default;
+	//Synth(const Synth& rhs) = default;
+	Synth(Image i, int patchSize, bool small, int resultSideLength);
 	void synthesize();
 	void assignColor(uint a, uint b);
 };
