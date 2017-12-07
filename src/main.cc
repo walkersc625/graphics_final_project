@@ -27,10 +27,14 @@
 using namespace std;
 using namespace cimg_library;
 
+GUI* gui = nullptr;
+
 void runProgram(Synth* synth) {
 	synth->synthesize();
 	printf("Done!");
 	delete (synth);
+	if (gui != nullptr)
+		delete (gui);
 }
 
 //handlers
@@ -66,7 +70,7 @@ int main(int argc, char* argv[])
 	} else if (argc == 1) {
 
 		/* use GUI (No command line arguments) */
-		GUI* gui = new GUI();
+		gui = new GUI();
 		char* fp = gui->run();
 
 		/* get information from GUI */
@@ -80,7 +84,6 @@ int main(int argc, char* argv[])
 		if (patchSizeValue > resultSizeValue) {
 			patchSizeValue = 127;
 		}
-
 
 		i = Image(filepath);
 		synth = new Synth(i, patchSizeValue, false, resultSizeValue);
