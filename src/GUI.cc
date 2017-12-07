@@ -1,5 +1,6 @@
 #include "GUI.h"
 #include <iostream>
+#include <functional>
 
 #define SINGLE 0
 
@@ -7,7 +8,7 @@ using namespace std;
 
 GUI::GUI()
 {
-	mainWindow = new Fl_Window(300, 200, "Look at this glorious little window");
+	mainWindow = new Fl_Window(180, 165, "Look at this glorious little window");
 
         patchSizeSlider = new Fl_Value_Slider(15, 15, 150, 25, "Patch size");
         patchSizeSlider->type(FL_HOR_NICE_SLIDER);
@@ -23,6 +24,9 @@ GUI::GUI()
         resultSizeSlider->slider_size(0.15);
         resultSizeSlider->precision(0);
 
+        synthButton = new Fl_Return_Button(15, 125, 150, 25, "Do Nothing :(");
+        //synthButton->callback( std::bind(synthButtonCallback, mainWindow) );
+
         mainWindow->end();
 	
 }
@@ -32,7 +36,13 @@ GUI::~GUI()
         delete (mainWindow);
         delete (patchSizeSlider);
         delete (resultSizeSlider);
+        delete (synthButton);
 }
+
+// static void GUI::synthButtonCallback(Fl_Window& fw)
+// {
+//         fw->hide();
+// }
 
 char* GUI::run()
 {
