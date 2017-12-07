@@ -33,12 +33,8 @@ void runProgram(Synth* synth) {
 	synth->synthesize();
 	printf("Done!");
 	delete (synth);
-	if (gui != nullptr)
-		delete (gui);
+	delete (gui);
 }
-
-//handlers
-//http://cimg.eu/reference/structcimg__library_1_1CImgDisplay.html
 
 int main(int argc, char* argv[])
 {
@@ -53,6 +49,7 @@ int main(int argc, char* argv[])
 	bool small;
 
 	if (argc == 2) {
+		
 		/* wrong number of arguments present */
 		printf("ERROR: Texture name and patch size required.\n");
 		return 0;
@@ -79,12 +76,12 @@ int main(int argc, char* argv[])
 		if (patchSizeValue % 2 == 0) {
 			patchSizeValue++;
 		}
-
 		int resultSizeValue = gui->resultSizeSlider->value();
 		if (patchSizeValue > resultSizeValue) {
 			patchSizeValue = 127;
 		}
 
+		/* construct synthesizer */
 		i = Image(filepath);
 		synth = new Synth(i, patchSizeValue, false, resultSizeValue);
 
