@@ -18,6 +18,7 @@
 
 #include "Texture.h"
 #include "arg_util.h"
+#include "GUI.h"
 
 #include <CImg/CImg.h>
 
@@ -52,6 +53,10 @@ int main(int argc, char* argv[])
 	}
 
 	bool small = (sizeFlag != nullptr && !strcmp(sizeFlag, "-s"));
+
+	/* GUI stuff */
+	GUI* gui = new GUI();
+	gui->run();
 
 	/* synthesize texture */
 	Image i = Image(filepath);
