@@ -5,6 +5,8 @@
 #include <cstdlib>
 #include <cmath>
 
+#define GRAY (unsigned char) 100
+
 using namespace std;
 
 /*******************/
@@ -13,12 +15,11 @@ using namespace std;
 
 Pixel Texture::getPixel(int x, int y) const
 {
-	if(x >= image.width() || y >= image.height() || 
+	if (x >= image.width() || y >= image.height() || 
 		x < 0 || y < 0 || !pixelsFilled[x][y]) {
-		// printf("getPixel in texture\n");
-		// printf("Invalid coordinates: %d, %d\n", x, y);
 		return error_pixel;
 	}
+
 	Pixel p;
 	p.r = (uint)(*image.data(x, y, 0, R));
 	p.g = (uint)(*image.data(x, y, 0, G));
@@ -42,6 +43,17 @@ void Texture::setPixel(int x, int y, Pixel p)
 Patch Texture::getPatch(int x, int y, int size)
 {
 	return Patch {this, x, y, size};
+}
+
+void Texture::clear()
+{
+	for (int x = 0; x < image.width(); x++) {
+		for (int y = 0; y < image.height(); y++) {
+			image(x, y, 0, R) = GRAY;
+			image(x, y, 0, G) = GRAY;
+			image(x, y, 0, B) = GRAY;
+		}
+	}
 }
 
 /*****************/
@@ -103,7 +115,7 @@ float Patch::difference(const Patch& other) const
 
 	// Otherwise go through whole patch and store for later
 	
-	for(pair<int,int> p : validPixels){
+	for (pair<int,int> p : validPixels){
 			pixelA = getPixel(p.first, p.second);
 			pixelB = other.getPixel(p.first, p.second);
 			diff += pixel_L1Norm(pixelA, pixelB);
@@ -115,11 +127,11 @@ float Patch::difference(const Patch& other) const
 
 void Patch::fillValidPixels()
 {
-	for(int i =0; i<width; i++){
-		for(int j=0; j<width; j++){
-			if(i+offsetX >= 0 && i+offsetX < sourceImage->image.width() &&
+	for (int i =0; i<width; i++){
+		for (int j=0; j<width; j++){
+			if (i+offsetX >= 0 && i+offsetX < sourceImage->image.width() &&
 				j+offsetY >= 0 && j+offsetY < sourceImage->image.height()) {
-				if(sourceImage->pixelsFilled[i+offsetX][j+offsetY]) {
+				if (sourceImage->pixelsFilled[i+offsetX][j+offsetY]) {
 					validPixels.push_back(make_pair(i,j));
 				}
 			}
@@ -135,6 +147,7 @@ Synth::Synth(Image i, int patchSize, bool small, int resultSideLength) :
 		sample(i), result(Image()),
 		patchSize{patchSize}, sampleSideLength{i.width()}
 {
+	/* check for size inversion */
 	if (small) {
 		resultSideLength = 128;
 		if (patchSize > 128) {
@@ -142,23 +155,26 @@ Synth::Synth(Image i, int patchSize, bool small, int resultSideLength) :
 		}
 	}
 
+	/* save side length for later use */
 	sideLength = resultSideLength;
 
+	/* set all pixels in sample to true */
 	sample.pixelsFilled =
-		vector<vector<bool>>(sampleSideLength, vector<bool>(sampleSideLength, true));
+		vector<vector<bool>>(sampleSideLength,
+			vector<bool>(sampleSideLength, true));
 
 	result = Texture(Image(resultSideLength, resultSideLength, 1, 3));
+	result.clear();
 }
 
 void Synth::synthesize()
 {
-	if(!sanityChecks()) return;
+	if (!sanityChecks()) return;
 	placeSeed();
-	// Loop around seed, need to synthesize middle pixel in patch
+	/* Loop around seed, need to synthesize middle pixel in patch */
 	int a = patchSize;
 	int b = 0;
 	while (a < sideLength) {
-		// printf("a = %d, b = %d\n", a, b);
 		assignColor(a,b);
 		assignColor(b,a);
 		b++;
@@ -172,28 +188,26 @@ void Synth::synthesize()
 
 bool Synth::sanityChecks()
 {
-	if(patchSize > sampleSideLength) {
+	if (patchSize > sampleSideLength) {
 		printf("Error patchsize %d is greater than sampleSize %d\n", patchSize, sampleSideLength);
 		return false;
 	}
-	if(patchSize > sideLength) {
+	if (patchSize > sideLength) {
 		printf("Error patchsize %d is greater than result size %d\n", patchSize, sideLength);
 		return false;
 	}
-	if(sideLength < sampleSideLength) {
+	if (sideLength < sampleSideLength) {
 		printf("Result size %d is smaller than sample size %d (not an error but you're weird)\n", sideLength, sampleSideLength);
 	}
 	return true;
 }
-//Copies a randomly chosen seed patch from sample to (0,0) of result.
+
+/*Copies a randomly chosen seed patch from sample to (0,0) of result.*/
 void Synth::placeSeed()
 {
 	srand(time(NULL));
 	uint randX = rand() % (sampleSideLength - patchSize);
 	uint randY = rand() % (sampleSideLength - patchSize);
-
-	cout << "randX: " << randX << endl;
-	cout << "randY: " << randY << endl;
 
 	Patch samplePatch = sample.getPatch(randX, randY, patchSize);
 	Patch centerPatch = result.getPatch(0, 0, patchSize);
@@ -221,7 +235,7 @@ void Synth::assignColor(uint a, uint b)
 		for (int j = 0; j < sampleSideLength - patchSize; j++) {
 			sam = sample.getPatch(i, j, patchSize);
 			float diff = res.difference(sam);
-			if(diffs.size() <= 5) {
+			if (diffs.size() <= 5) {
 				diffs.push_back(make_pair(diff, make_pair(i, j)));
 			} else {
 				diffs[5] = make_pair(diff, make_pair(i, j));
@@ -233,7 +247,7 @@ void Synth::assignColor(uint a, uint b)
 	// "similarity measure" is 100/difference
 	// find sum of similarities
 	float similaritySum = 0;
-	for(int i = 0; i < 5; i++) {
+	for (int i = 0; i < 5; i++) {
 		pair<float, pair<uint, uint>> candidate = diffs[i];
 		similaritySum += 100.0 / candidate.first;
 	}
@@ -243,10 +257,10 @@ void Synth::assignColor(uint a, uint b)
 	float r = (float)rand() * (similaritySum / RAND_MAX);
 	pair<float, pair<uint, uint>> chosenDiff;
 	float similarity;
-	for(int i = 0; i < 5; i++) {
+	for (int i = 0; i < 5; i++) {
 		pair<float, pair<uint, uint>> candidate = diffs[i];
 		similarity = 100.0 / candidate.first;
-		if(r <= similarity) {
+		if (r <= similarity) {
 			chosenDiff = candidate;
 			break;
 		}

@@ -23,8 +23,6 @@ GUI::GUI()
         resultSizeSlider->slider_size(0.15);
         resultSizeSlider->precision(0);
 
-        fileChooser = new Fl_File_Chooser("../assets/", "*", SINGLE, "Texture Sample");
-
         mainWindow->end();
 	
 }
@@ -33,15 +31,12 @@ GUI::~GUI()
 {
         delete (mainWindow);
         delete (patchSizeSlider);
-        delete (fileChooser);
 }
 
 char* GUI::run()
 {
 	mainWindow->show();
-        //fileChooser->show();
         char* file = fl_file_chooser("Texture sample", "*", "../assets/");
-        cout << file << endl;
 	Fl::run();
         return file;
 }

@@ -14,7 +14,7 @@ struct GUI {
    	Fl_Value_Slider* patchSizeSlider;
    	Fl_Value_Slider* resultSizeSlider;
 //   	Fl_Check_Button* centerCheckButton;
-   	Fl_File_Chooser* fileChooser;
+
  	GUI();
  	~GUI();
  	char* run();

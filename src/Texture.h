@@ -36,6 +36,7 @@ struct Texture {
 	Pixel getPixel(int x, int y) const;
 	void setPixel(int x, int y, Pixel p);
 	Patch getPatch(int offsetX, int offsetY, int size);
+	void clear();
 };
 
 //Small sampling window for algorithm
