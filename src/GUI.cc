@@ -31,6 +31,7 @@ GUI::~GUI()
 {
         delete (mainWindow);
         delete (patchSizeSlider);
+        delete (resultSizeSlider);
 }
 
 char* GUI::run()
