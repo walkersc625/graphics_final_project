@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
 	char* sizeFlag = argv[3];
 
 	/* parse argument */
-	if (textureName == NULL || patchSize == NULL) {
+	if (textureName == nullptr || patchSize == nullptr) {
 		printf("ERROR: Texture name and patch size required.\n");
 		return 0;
 	}
@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
-	bool small = (!strcmp(sizeFlag, "-s"));
+	bool small = (sizeFlag != nullptr && !strcmp(sizeFlag, "-s"));
 
 	/* synthesize texture */
 	Image i = Image(filepath);
