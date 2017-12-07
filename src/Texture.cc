@@ -144,8 +144,8 @@ void Synth::synthesize()
 	if(!sanityChecks()) return;
 	placeSeed();
 	// Loop around seed, need to synthesize middle pixel in patch
-	uint a = patchSize;
-	uint b = 0;
+	int a = patchSize;
+	int b = 0;
 	while (a < sideLength) {
 		//printf("a = %d, b = %d\n", a, b);
 		assignColor(a,b);

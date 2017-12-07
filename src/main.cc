@@ -18,6 +18,7 @@
 
 #include "Texture.h"
 #include "arg_util.h"
+#include "GUI.h"
 
 #include <CImg/CImg.h>
 
@@ -50,6 +51,10 @@ int main(int argc, char* argv[])
 	if(!parse_args(textureName, sizeFlag, filepath)) {
 		return 0;
 	}
+
+	/* GUI stuff */
+	GUI* gui = new GUI();
+	gui->run();
 
 
 	/* synthesize texture */
