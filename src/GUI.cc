@@ -43,8 +43,8 @@ GUI::~GUI()
 
 void GUI::synthButtonCallback(Fl_Widget* w, void* v)
 {
+    cout << "in callback function\n";
     w->window()->hide();
-
 }
 
 char* GUI::run()

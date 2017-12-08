@@ -85,7 +85,6 @@ int main(int argc, char* argv[])
 		/* construct synthesizer */
 		i = Image(filepath);
 		synth = new Synth(i, patchSizeValue, false, resultSizeValue);
-
 	}
 
 
