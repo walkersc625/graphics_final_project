@@ -23,6 +23,7 @@
 #include <CImg/CImg.h>
 
 #define MAX_ARG_LENGTH 100
+#define EXIT_STATUS_NORMAL -1
 
 using namespace std;
 using namespace cimg_library;
@@ -96,9 +97,12 @@ int main(int argc, char* argv[])
 	CImgDisplay sample_disp(synth->sample.image,"Sample texture");
 
 	/* poll for mouse or keyboard interrupts */
-	while (!sample_disp.is_closed() || !result_disp.is_closed()) {
+	while (!sample_disp.is_closed() && !result_disp.is_closed()) {
 		result_disp.display(synth->result.image);
     }
 
-	return 0;
+    sample_disp.close();
+    result_disp.close();
+
+    exit(EXIT_STATUS_NORMAL);
 }

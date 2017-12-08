@@ -20,7 +20,7 @@ struct GUI {
 
  	GUI();
  	~GUI();
- 	//static void synthButtonCallback(Fl_Window& fw);
+ 	static void synthButtonCallback(Fl_Widget* w, void* v);
  	char* run();
 };
 
