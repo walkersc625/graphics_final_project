@@ -167,10 +167,14 @@ Synth::Synth(Image i, int patchSize, bool small, int resultSideLength) :
 	result.clear();
 }
 
-void Synth::synthesize()
+void Synth::synthesize_from_top_left()
 {
 	if (!sanityChecks()) return;
-	placeSeed();
+
+	Patch seed = getSeed();
+	Patch cornerPatch = result.getPatch(0, 0, patchSize);
+	cornerPatch.copyPatch(seed);
+
 	/* Loop around seed, need to synthesize middle pixel in patch */
 	int a = patchSize;
 	int b = 0;
@@ -182,6 +186,39 @@ void Synth::synthesize()
 			assignColor(a,a);
 			a++;
 			b=0;
+		}
+	}
+}
+
+pair<int, int> translate(int x, int y, pair<int, int> origin)
+{
+	return std::make_pair(x + origin.first, y + origin.second);
+}
+
+void Synth::synthesize_from_center()
+{
+	if (!sanityChecks()) return;
+
+	Patch seed = getSeed();
+	Patch centerPatch = result.getPatch((sideLength - patchSize)/2, (sideLength - patchSize)/2, patchSize);
+	printf("Patch at %d, %d\n", centerPatch.offsetX, centerPatch.offsetY);
+	centerPatch.copyPatch(seed);
+
+	/* Loop around seed, need to synthesize middle pixel in patch */
+	pair<int, int> origin = make_pair(sideLength/2, sideLength/2);
+	int a = patchSize/2;
+	int b = patchSize/2-1;
+	int iter = 1;
+	while (a < sideLength/2 && b >= -sideLength/2) {
+		assignColor(translate(a, b, origin));
+		assignColor(translate(b, -a, origin));
+		assignColor(translate(-a, -b, origin));
+		assignColor(translate(-b, a, origin));
+		b--;
+		if (b == -(patchSize/2) - iter) {
+			a++;
+			b=patchSize/2 + iter;
+			iter++;
 		}
 	}
 }
@@ -203,15 +240,14 @@ bool Synth::sanityChecks()
 }
 
 /*Copies a randomly chosen seed patch from sample to (0,0) of result.*/
-void Synth::placeSeed()
+Patch Synth::getSeed()
 {
 	srand(time(NULL));
 	uint randX = rand() % (sampleSideLength - patchSize);
 	uint randY = rand() % (sampleSideLength - patchSize);
 
 	Patch samplePatch = sample.getPatch(randX, randY, patchSize);
-	Patch centerPatch = result.getPatch(0, 0, patchSize);
-	centerPatch.copyPatch(samplePatch);
+	return samplePatch;
 }
 
 // assignColor
@@ -272,4 +308,8 @@ void Synth::assignColor(uint a, uint b)
 	uint y = chosenDiff.second.second;
 	sam = sample.getPatch(x, y, patchSize);
 	res.setPixel(patchSize/2, patchSize/2, sam.getCenterPixel());
+}
+
+void Synth::assignColor(pair<int, int> p) {
+	return assignColor(p.first, p.second);
 }

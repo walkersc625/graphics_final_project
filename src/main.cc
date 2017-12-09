@@ -15,6 +15,7 @@
 #include <glm/gtx/io.hpp>
 #include <debuggl.h>
 #include <thread>
+#include <string>
 
 #include "Texture.h"
 #include "arg_util.h"
@@ -31,10 +32,9 @@ using namespace cimg_library;
 GUI* gui = nullptr;
 
 void runProgram(Synth* synth) {
-	synth->synthesize();
+	synth->synthesize_from_center();
+
 	printf("Done!");
-	delete (synth);
-	delete (gui);
 }
 
 int main(int argc, char* argv[])
@@ -100,8 +100,20 @@ int main(int argc, char* argv[])
 		result_disp.display(synth->result.image);
     }
 
+    if (gui->saveOptionButton->value() == 1) {
+    	const char* filename = gui->saveFileNameInput->value();
+    	if (strlen(filename) == 0) {
+    		filename = "result.jpg";
+    	}
+    	string filepath = string("../results/") + string(filename);
+   		synth->result.image.save(&filepath[0]);
+    }
+
     sample_disp.close();
     result_disp.close();
+
+	delete (synth);
+	delete (gui);
 
     exit(EXIT_STATUS_NORMAL);
 }

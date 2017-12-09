@@ -9,7 +9,7 @@ using namespace std::placeholders;
 
 GUI::GUI()
 {
-    mainWindow = new Fl_Window(180, 165, "Look at this glorious little window");
+    mainWindow = new Fl_Window(600, 400, "Look at this glorious little window");
 
     patchSizeSlider = new Fl_Value_Slider(15, 15, 150, 25, "Patch size");
     patchSizeSlider->type(FL_HOR_NICE_SLIDER);
@@ -25,7 +25,12 @@ GUI::GUI()
     resultSizeSlider->slider_size(0.15);
     resultSizeSlider->precision(0);
 
-    synthButton = new Fl_Return_Button(15, 125, 150, 25, "Synthesize");
+    saveOptionButton = new Fl_Check_Button(15, 125, 25, 25, "Save result" );
+
+    saveFileNameInput = new Fl_Input(15, 175, 400, 25 ,"");
+
+    /* Start Button */
+    synthButton = new Fl_Return_Button(15, 225, 150, 25, "Synthesize");
     synthButton->callback(synthButtonCallback);
     //bind(GUI::synthButtonCallback, this, _1, _2)
 
@@ -39,6 +44,8 @@ GUI::~GUI()
     delete (patchSizeSlider);
     delete (resultSizeSlider);
     delete (synthButton);
+    delete (saveOptionButton);
+    delete (saveFileNameInput);
 }
 
 void GUI::synthButtonCallback(Fl_Widget* w, void* v)

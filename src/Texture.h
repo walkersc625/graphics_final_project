@@ -58,7 +58,7 @@ struct Patch {
 class Synth {
 private:
 	bool sanityChecks();
-	void placeSeed();
+	Patch getSeed();
 public:
 	int patchSize; // size n means an n^2 pxel patch
 
@@ -71,8 +71,10 @@ public:
 	Synth() = default;
 	//Synth(const Synth& rhs) = default;
 	Synth(Image i, int patchSize, bool small, int resultSideLength);
-	void synthesize();
+	void synthesize_from_top_left();
+	void synthesize_from_center();
 	void assignColor(uint a, uint b);
+	void assignColor(pair<int, int> p);
 };
 
 #endif
