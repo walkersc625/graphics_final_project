@@ -112,8 +112,10 @@ int main(int argc, char* argv[])
     sample_disp.close();
     result_disp.close();
 
-	delete (synth);
-	delete (gui);
+    //we'll just leak memory I guess,
+    //because this causes a segmentation fault
+	//delete (synth);
+	//delete (gui);
 
     exit(EXIT_STATUS_NORMAL);
 }

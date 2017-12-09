@@ -9,16 +9,16 @@ using namespace std::placeholders;
 
 GUI::GUI()
 {
-    mainWindow = new Fl_Window(600, 400, "Look at this glorious little window");
+    mainWindow = new Fl_Window(430, 275, "Look at this glorious little window");
 
-    patchSizeSlider = new Fl_Value_Slider(15, 15, 150, 25, "Patch size");
+    patchSizeSlider = new Fl_Value_Slider(15, 15, 400, 25, "Patch size");
     patchSizeSlider->type(FL_HOR_NICE_SLIDER);
     patchSizeSlider->bounds(3, 39);
     patchSizeSlider->value(3);
     patchSizeSlider->slider_size(0.15);
     patchSizeSlider->precision(0);
 
-    resultSizeSlider = new Fl_Value_Slider(15, 75, 150, 25, "Result size");
+    resultSizeSlider = new Fl_Value_Slider(15, 75, 400, 25, "Result size");
     resultSizeSlider->type(FL_HOR_NICE_SLIDER);
     resultSizeSlider->bounds(128, 512);
     resultSizeSlider->value(128);
