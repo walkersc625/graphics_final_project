@@ -167,16 +167,31 @@ Synth::Synth(Image i, int patchSize, bool small, int resultSideLength) :
 	result.clear();
 }
 
-void Synth::synthesize_from_top_left()
-{
-	if (!sanityChecks()) return;
+void Synth::synthesize() {
+    if (!sanityChecks()) return;
 
-	Patch seed = getSeed();
-	Patch cornerPatch = result.getPatch(0, 0, patchSize);
+    Patch seed;
+    if(seedType == WHOLE_IMAGE) {
+        seed = sample.getPatch(0, 0, sampleSideLength);
+    } else {
+        seed = getSeed();
+    }
+
+    if(seedPlacement == CENTER) {
+        synthesize_from_center(seed);
+    } else {
+        synthesize_from_top_left(seed);
+    }
+}
+
+void Synth::synthesize_from_top_left(Patch seed)
+{
+        int seedSize = seed.width;
+	Patch cornerPatch = result.getPatch(0, 0, seedSize);
 	cornerPatch.copyPatch(seed);
 
 	/* Loop around seed, need to synthesize middle pixel in patch */
-	int a = patchSize;
+	int a = seedSize;
 	int b = 0;
 	while (a < sideLength) {
 		assignColor(a,b);
@@ -195,19 +210,16 @@ pair<int, int> translate(int x, int y, pair<int, int> origin)
 	return std::make_pair(x + origin.first, y + origin.second);
 }
 
-void Synth::synthesize_from_center()
+void Synth::synthesize_from_center(Patch seed)
 {
-	if (!sanityChecks()) return;
-
-	Patch seed = getSeed();
-	Patch centerPatch = result.getPatch((sideLength - patchSize)/2, (sideLength - patchSize)/2, patchSize);
-	printf("Patch at %d, %d\n", centerPatch.offsetX, centerPatch.offsetY);
+        int seedSize = seed.width;
+	Patch centerPatch = result.getPatch((sideLength - seedSize)/2, (sideLength - seedSize)/2, seedSize);
 	centerPatch.copyPatch(seed);
 
 	/* Loop around seed, need to synthesize middle pixel in patch */
 	pair<int, int> origin = make_pair(sideLength/2, sideLength/2);
-	int a = patchSize/2;
-	int b = patchSize/2-1;
+	int a = seedSize/2;
+	int b = seedSize/2-1;
 	int iter = 1;
 	while (a < sideLength/2 && b >= -sideLength/2) {
 		assignColor(translate(a, b, origin));
@@ -215,9 +227,9 @@ void Synth::synthesize_from_center()
 		assignColor(translate(-a, -b, origin));
 		assignColor(translate(-b, a, origin));
 		b--;
-		if (b == -(patchSize/2) - iter) {
+		if (b == -(seedSize/2) - iter) {
 			a++;
-			b=patchSize/2 + iter;
+			b=seedSize/2 + iter;
 			iter++;
 		}
 	}
@@ -234,7 +246,12 @@ bool Synth::sanityChecks()
 		return false;
 	}
 	if (sideLength < sampleSideLength) {
+            if(seedType == RAND_PATCH) {
 		printf("Result size %d is smaller than sample size %d (not an error but you're weird)\n", sideLength, sampleSideLength);
+            } else {
+                printf("Result size %d is smaller than sample size %d (either choose a larger result or use a random patch as a starting seed)\n", sideLength, sampleSideLength);
+                return false;
+            }
 	}
 	return true;
 }

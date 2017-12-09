@@ -32,7 +32,7 @@ using namespace cimg_library;
 GUI* gui = nullptr;
 
 void runProgram(Synth* synth) {
-	synth->synthesize_from_center();
+	synth->synthesize();
 
 	printf("Done!");
 }
@@ -85,6 +85,8 @@ int main(int argc, char* argv[])
 		/* construct synthesizer */
 		i = Image(filepath);
 		synth = new Synth(i, patchSizeValue, false, resultSizeValue);
+                synth->seedPlacement = gui->centerSeed() ? CENTER : CORNER;
+                synth->seedType = gui->usePatchAsSeed() ? RAND_PATCH : WHOLE_IMAGE;
 	}
 
 

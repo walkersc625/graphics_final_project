@@ -24,6 +24,16 @@ enum Colors {
 	B
 };
 
+enum SeedType {
+    WHOLE_IMAGE,
+    RAND_PATCH
+};
+
+enum SeedPlacement {
+    CENTER,
+    CORNER
+};
+
 static const Pixel error_pixel = Pixel(-1, -1, -1);
 
 struct Patch;
@@ -59,11 +69,18 @@ class Synth {
 private:
 	bool sanityChecks();
 	Patch getSeed();
+	void synthesize_from_top_left(Patch seed);
+	void synthesize_from_center(Patch seed);
+	void assignColor(uint a, uint b);
+	void assignColor(pair<int, int> p);
 public:
 	int patchSize; // size n means an n^2 pxel patch
 
 	int sideLength = 512;
 	int sampleSideLength;
+
+        SeedPlacement seedPlacement = CENTER;
+        SeedType seedType = RAND_PATCH;
 
 	Texture sample;
 	Texture result;
@@ -71,10 +88,7 @@ public:
 	Synth() = default;
 	//Synth(const Synth& rhs) = default;
 	Synth(Image i, int patchSize, bool small, int resultSideLength);
-	void synthesize_from_top_left();
-	void synthesize_from_center();
-	void assignColor(uint a, uint b);
-	void assignColor(pair<int, int> p);
+        void synthesize();
 };
 
 #endif
