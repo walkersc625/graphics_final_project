@@ -4,6 +4,7 @@
 #include <glm/gtx/norm.hpp>
 #include <cstdlib>
 #include <cmath>
+#include <thread>
 
 #define GRAY (unsigned char) 100
 
@@ -184,55 +185,56 @@ void Synth::synthesize() {
     }
 }
 
+void Synth::thread_synthesize(bool vert, int start, int min, int max)
+{
+	for(int i=min; i<=max; i++) {
+		if(vert) {
+			assignColor(start, i);
+		}
+		else {
+			assignColor(i, start);
+		}
+	}
+}
+
 void Synth::synthesize_from_top_left(Patch seed)
 {
-        int seedSize = seed.width;
+  int seedSize = seed.width;
 	Patch cornerPatch = result.getPatch(0, 0, seedSize);
 	cornerPatch.copyPatch(seed);
 
 	/* Loop around seed, need to synthesize middle pixel in patch */
 	int a = seedSize;
-	int b = 0;
-	while (a < sideLength) {
-		assignColor(a,b);
-		assignColor(b,a);
-		b++;
-		if (b == a) {
-			assignColor(a,a);
-			a++;
-			b=0;
-		}
-	}
-}
-
-pair<int, int> translate(int x, int y, pair<int, int> origin)
-{
-	return std::make_pair(x + origin.first, y + origin.second);
+	while(a<sideLength){
+		thread t1(&Synth::thread_synthesize, this, true, a, 0, a);
+		thread t2(&Synth::thread_synthesize, this, false, a, 0, a);
+		t1.join();
+		t2.join();
+		a++;
+	}	
 }
 
 void Synth::synthesize_from_center(Patch seed)
 {
-        int seedSize = seed.width;
+  int seedSize = seed.width;
 	Patch centerPatch = result.getPatch((sideLength - seedSize)/2, (sideLength - seedSize)/2, seedSize);
 	centerPatch.copyPatch(seed);
 
 	/* Loop around seed, need to synthesize middle pixel in patch */
-	pair<int, int> origin = make_pair(sideLength/2, sideLength/2);
-	int a = seedSize/2;
-	int b = seedSize/2-1;
-	int iter = 1;
-	while (a < sideLength/2 && b >= -sideLength/2) {
-		assignColor(translate(a, b, origin));
-		assignColor(translate(b, -a, origin));
-		assignColor(translate(-a, -b, origin));
-		assignColor(translate(-b, a, origin));
-		b--;
-		if (b == -(seedSize/2) - iter) {
-			a++;
-			b=seedSize/2 + iter;
-			iter++;
-		}
-	}
+	int a = (sideLength-seedSize)/2 - 1;
+	int b = (sideLength-seedSize)/2 + seedSize;
+	while(a > -1 && b< sideLength){
+		thread t1(&Synth::thread_synthesize, this, true, a, a, b); // Left
+		thread t2(&Synth::thread_synthesize, this, false, a, a, b); // Top
+		thread t3(&Synth::thread_synthesize, this, true, b, a, b); // Right
+		thread t4(&Synth::thread_synthesize, this, false, b, a, b); // Bottom
+		t1.join();
+		t2.join();
+		t3.join();
+		t4.join();
+		a--;
+		b++;
+	}	
 }
 
 bool Synth::sanityChecks()

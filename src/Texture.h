@@ -89,6 +89,7 @@ public:
 	//Synth(const Synth& rhs) = default;
 	Synth(Image i, int patchSize, bool small, int resultSideLength);
         void synthesize();
+    void thread_synthesize(bool vert, int start, int min, int max);
 };
 
 #endif
