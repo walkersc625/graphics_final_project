@@ -185,6 +185,9 @@ void Synth::synthesize() {
     }
 }
 
+/* Synthesizes a line (vertical or horizontal), from min - max inclusive.
+	 start is the value of the x/y coordinate that doesn't vary
+*/
 void Synth::thread_synthesize(bool vert, int start, int min, int max)
 {
 	for(int i=min; i<=max; i++) {
@@ -223,7 +226,7 @@ void Synth::synthesize_from_center(Patch seed)
 	/* Loop around seed, need to synthesize middle pixel in patch */
 	int a = (sideLength-seedSize)/2 - 1;
 	int b = (sideLength-seedSize)/2 + seedSize;
-	while(a > -1 && b< sideLength){
+	while(a > -1){
 		thread t1(&Synth::thread_synthesize, this, true, a, a, b); // Left
 		thread t2(&Synth::thread_synthesize, this, false, a, a, b); // Top
 		thread t3(&Synth::thread_synthesize, this, true, b, a, b); // Right
@@ -234,6 +237,14 @@ void Synth::synthesize_from_center(Patch seed)
 		t4.join();
 		a--;
 		b++;
+	}
+
+	// Do last row and column if seed was not perfectly centered
+	if(b<sideLength){
+		thread t3(&Synth::thread_synthesize, this, true, b, a+1, b); // Right
+		thread t4(&Synth::thread_synthesize, this, false, b, a+1, b); // Bottom
+		t3.join();
+		t4.join();
 	}	
 }
 
