@@ -4,6 +4,7 @@
 #include <glm/gtx/norm.hpp>
 #include <cstdlib>
 #include <cmath>
+#include <iomanip>
 #include <thread>
 
 #define GRAY (unsigned char) 100
@@ -103,7 +104,7 @@ inline float pixel_L1Norm(Pixel pixelA, Pixel pixelB) {
 	return d;
 }
 
-float Patch::difference(const Patch& other) const
+float Patch::difference(const Patch& other, float** gaussian) const
 {
 	if (other.width != width) {
 		cout << "Comparing patches of different sizes!\n";
@@ -119,11 +120,15 @@ float Patch::difference(const Patch& other) const
 	for (pair<int,int> p : validPixels){
 			pixelA = getPixel(p.first, p.second);
 			pixelB = other.getPixel(p.first, p.second);
-			diff += pixel_L1Norm(pixelA, pixelB);
+			diff += pixel_L1Norm(pixelA, pixelB) * gaussian[p.first][p.second];
 	}
 	
-	
-	return diff / validPixels.size();
+	// Dividing by sum again seems to make it worse.
+	// Maybe with the gaussian multiplier it's so small that it becomes innacurate?
+	// Either way since we're always comparing the same patch we're only comparing
+	// this to other things with the same number of pixels, so we shouldn't lose
+	// any accuracy by not normalizing.
+	return diff;// / validPixels.size();
 }
 
 void Patch::fillValidPixels()
@@ -166,6 +171,39 @@ Synth::Synth(Image i, int patchSize, bool small, int resultSideLength) :
 
 	result = Texture(Image(resultSideLength, resultSideLength, 1, 3));
 	result.clear();
+
+	gaussian = generateGaussian(patchSize);
+}
+
+float** Synth::generateGaussian(int size) {
+	float** gaussian = new float*[size];
+	for(int i = 0; i < size; i++) {
+		gaussian[i] = new float[size];
+	}
+
+	double sigma = 1.0;
+	double r, s = 2.0 * sigma * sigma;
+ 
+	// sum is for normalization
+	double sum = 0.0;
+
+	for (int i = 0; i < size; i++) {
+		for(int j = 0; j < size; j++) {
+			float x = i - ((size-1)/2.0);
+			float y = j - ((size-1)/2.0);
+			r = x*x + y*y;
+			gaussian[i][j] = exp((-r/s)/(M_PI * s));
+			sum += gaussian[i][j];
+		}
+    }
+ 
+	// normalize
+	for (int i = 0; i < size; ++i) {
+		for (int j = 0; j < size; ++j) {
+			gaussian[i][j] /= sum;
+		}
+	}
+	return gaussian;
 }
 
 void Synth::synthesize() {
@@ -188,64 +226,77 @@ void Synth::synthesize() {
 /* Synthesizes a line (vertical or horizontal), from min - max inclusive.
 	 start is the value of the x/y coordinate that doesn't vary
 */
-void Synth::thread_synthesize(bool vert, int start, int min, int max)
+void Synth::thread_synthesize(bool vert, int start, int min, int max, ParamUpdateFunc updateParams)
 {
-	for(int i=min; i<=max; i++) {
-		if(vert) {
-			assignColor(start, i);
+	tuple<int, int, int> params;
+	while(min >= 0 && max < sideLength) {
+		for(int i=min; i<=max; i++) {
+			if(vert) {
+				assignColor(start, i);
+			}
+			else {
+				assignColor(i, start);
+			}
 		}
-		else {
-			assignColor(i, start);
-		}
+		params = updateParams(start, min, max);
+		start = get<0>(params);
+		min = get<1>(params);
+		max = get<2>(params);
 	}
+}
+
+tuple<int, int, int> topLeftParamUpdate(int a, int dummy1, int dummy2) {
+	// B and c are dummy variables. Only a changes (and a === c)
+	return std::make_tuple(a + 1, 0, a + 1);
 }
 
 void Synth::synthesize_from_top_left(Patch seed)
 {
-  int seedSize = seed.width;
+	int seedSize = seed.width;
 	Patch cornerPatch = result.getPatch(0, 0, seedSize);
 	cornerPatch.copyPatch(seed);
 
 	/* Loop around seed, need to synthesize middle pixel in patch */
 	int a = seedSize;
-	while(a<sideLength){
-		thread t1(&Synth::thread_synthesize, this, true, a, 0, a);
-		thread t2(&Synth::thread_synthesize, this, false, a, 0, a);
-		t1.join();
-		t2.join();
-		a++;
-	}	
+	thread t1(&Synth::thread_synthesize, this, true, a, 0, a, topLeftParamUpdate);
+	thread t2(&Synth::thread_synthesize, this, false, a, 0, a, topLeftParamUpdate);
+	t1.join();
+	t2.join();
+}
+
+tuple<int, int, int> centerTopAndLeftParamUpdate(int a, int dummy, int b) {
+	return std::make_tuple(a - 1, a - 1, b + 1);
+}
+
+tuple<int, int, int> centerBotAndRightParamUpdate(int b, int a, int dummy) {
+	return std::make_tuple(b + 1, a - 1, b + 1);
 }
 
 void Synth::synthesize_from_center(Patch seed)
 {
-  int seedSize = seed.width;
+	int seedSize = seed.width;
 	Patch centerPatch = result.getPatch((sideLength - seedSize)/2, (sideLength - seedSize)/2, seedSize);
 	centerPatch.copyPatch(seed);
 
 	/* Loop around seed, need to synthesize middle pixel in patch */
 	int a = (sideLength-seedSize)/2 - 1;
 	int b = (sideLength-seedSize)/2 + seedSize;
-	while(a > -1){
-		thread t1(&Synth::thread_synthesize, this, true, a, a, b); // Left
-		thread t2(&Synth::thread_synthesize, this, false, a, a, b); // Top
-		thread t3(&Synth::thread_synthesize, this, true, b, a, b); // Right
-		thread t4(&Synth::thread_synthesize, this, false, b, a, b); // Bottom
-		t1.join();
-		t2.join();
-		t3.join();
-		t4.join();
-		a--;
-		b++;
-	}
+	thread t1(&Synth::thread_synthesize, this, true, a, a, b, centerTopAndLeftParamUpdate); // Left
+	thread t2(&Synth::thread_synthesize, this, false, a, a, b, centerTopAndLeftParamUpdate); // Top
+	thread t3(&Synth::thread_synthesize, this, true, b, a, b, centerBotAndRightParamUpdate); // Right
+	thread t4(&Synth::thread_synthesize, this, false, b, a, b, centerBotAndRightParamUpdate); // Bottom
+	t1.join();
+	t2.join();
+	t3.join();
+	t4.join();
 
 	// Do last row and column if seed was not perfectly centered
-	if(b<sideLength){
-		thread t3(&Synth::thread_synthesize, this, true, b, a+1, b); // Right
-		thread t4(&Synth::thread_synthesize, this, false, b, a+1, b); // Bottom
-		t3.join();
-		t4.join();
-	}	
+	// if(b<sideLength){
+	// 	thread t3(&Synth::thread_synthesize, this, true, b, a+1, b); // Right
+	// 	thread t4(&Synth::thread_synthesize, this, false, b, a+1, b); // Bottom
+	// 	t3.join();
+	// 	t4.join();
+	// }	
 }
 
 bool Synth::sanityChecks()
@@ -300,7 +351,7 @@ void Synth::assignColor(uint a, uint b)
 	for (int i = 0; i < sampleSideLength - patchSize; i++) {
 		for (int j = 0; j < sampleSideLength - patchSize; j++) {
 			sam = sample.getPatch(i, j, patchSize);
-			float diff = res.difference(sam);
+			float diff = res.difference(sam, gaussian);
 			if (diffs.size() <= 5) {
 				diffs.push_back(make_pair(diff, make_pair(i, j)));
 			} else {

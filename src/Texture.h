@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <tuple>
 
 #include <GL/glew.h>
 #include <CImg/CImg.h>
@@ -17,6 +18,7 @@ struct Patch;
 
 typedef CImg<unsigned char> Image;
 typedef uvec3 Pixel;
+typedef tuple<int, int, int> (*ParamUpdateFunc)(int, int, int);
 
 enum Colors {
 	R,
@@ -25,13 +27,13 @@ enum Colors {
 };
 
 enum SeedType {
-    WHOLE_IMAGE,
-    RAND_PATCH
+	WHOLE_IMAGE,
+	RAND_PATCH
 };
 
 enum SeedPlacement {
-    CENTER,
-    CORNER
+	CENTER,
+	CORNER
 };
 
 static const Pixel error_pixel = Pixel(-1, -1, -1);
@@ -60,7 +62,7 @@ struct Patch {
 	Pixel getCenterPixel() const;
 	void setPixel(int x, int y, Pixel p);
 	void copyPatch(Patch& src);
-	float difference(const Patch& other) const;
+	float difference(const Patch& other, float** gaussian) const;
 	void fillValidPixels();
 };
 
@@ -73,14 +75,17 @@ private:
 	void synthesize_from_center(Patch seed);
 	void assignColor(uint a, uint b);
 	void assignColor(pair<int, int> p);
+	float** generateGaussian(int size);
 public:
 	int patchSize; // size n means an n^2 pxel patch
+
+	float** gaussian;
 
 	int sideLength = 512;
 	int sampleSideLength;
 
-        SeedPlacement seedPlacement = CENTER;
-        SeedType seedType = RAND_PATCH;
+	SeedPlacement seedPlacement = CENTER;
+	SeedType seedType = RAND_PATCH;
 
 	Texture sample;
 	Texture result;
@@ -88,8 +93,8 @@ public:
 	Synth() = default;
 	//Synth(const Synth& rhs) = default;
 	Synth(Image i, int patchSize, bool small, int resultSideLength);
-        void synthesize();
-    void thread_synthesize(bool vert, int start, int min, int max);
+	void synthesize();
+    void thread_synthesize(bool vert, int start, int min, int max, ParamUpdateFunc paramUpdate);
 };
 
 #endif
