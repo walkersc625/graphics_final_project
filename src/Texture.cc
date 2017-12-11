@@ -278,6 +278,9 @@ void Synth::synthesize_from_center(Patch seed)
 	Patch centerPatch = result.getPatch((sideLength - seedSize)/2, (sideLength - seedSize)/2, seedSize);
 	centerPatch.copyPatch(seed);
 
+	cout << "SideLength=" << sideLength << endl;
+	cout << "image width=" << result.image.width() << endl;
+
 	/* Loop around seed, need to synthesize middle pixel in patch */
 	int a = (sideLength-seedSize)/2 - 1;
 	int b = (sideLength-seedSize)/2 + seedSize;
@@ -291,12 +294,13 @@ void Synth::synthesize_from_center(Patch seed)
 	t4.join();
 
 	// Do last row and column if seed was not perfectly centered
-	// if(b<sideLength){
-	// 	thread t3(&Synth::thread_synthesize, this, true, b, a+1, b); // Right
-	// 	thread t4(&Synth::thread_synthesize, this, false, b, a+1, b); // Bottom
-	// 	t3.join();
-	// 	t4.join();
-	// }	
+	// (not really any need to multithread this)
+	if(!result.pixelsFilled[sideLength-1][sideLength-1]) {
+		for(int i=0; i < sideLength; i++) {
+			assignColor(sideLength-1, i);
+			assignColor(i, sideLength-1);
+		}
+	}	
 }
 
 bool Synth::sanityChecks()
