@@ -278,9 +278,6 @@ void Synth::synthesize_from_center(Patch seed)
 	Patch centerPatch = result.getPatch((sideLength - seedSize)/2, (sideLength - seedSize)/2, seedSize);
 	centerPatch.copyPatch(seed);
 
-	cout << "SideLength=" << sideLength << endl;
-	cout << "image width=" << result.image.width() << endl;
-
 	/* Loop around seed, need to synthesize middle pixel in patch */
 	int a = (sideLength-seedSize)/2 - 1;
 	int b = (sideLength-seedSize)/2 + seedSize;
