@@ -79,6 +79,7 @@ private:
 public:
 	int patchSize; // size n means an n^2 pxel patch
 
+	bool useGaussian;
 	float** gaussian;
 
 	int sideLength = 512;

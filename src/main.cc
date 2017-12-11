@@ -33,8 +33,6 @@ GUI* gui = nullptr;
 
 void runProgram(Synth* synth) {
 	synth->synthesize();
-
-	printf("Done!");
 }
 
 int main(int argc, char* argv[])
@@ -85,8 +83,9 @@ int main(int argc, char* argv[])
 		/* construct synthesizer */
 		i = Image(filepath);
 		synth = new Synth(i, patchSizeValue, false, resultSizeValue);
-                synth->seedPlacement = gui->centerSeed() ? CENTER : CORNER;
-                synth->seedType = gui->usePatchAsSeed() ? RAND_PATCH : WHOLE_IMAGE;
+		synth->seedPlacement = gui->centerSeed() ? CENTER : CORNER;
+		synth->seedType = gui->usePatchAsSeed() ? RAND_PATCH : WHOLE_IMAGE;
+		synth->useGaussian = gui->useGaussianButton->value();
 	}
 
 
@@ -113,11 +112,6 @@ int main(int argc, char* argv[])
 
     sample_disp.close();
     result_disp.close();
-
-    //we'll just leak memory I guess,
-    //because this causes a segmentation fault
-	//delete (synth);
-	//delete (gui);
 
     exit(EXIT_STATUS_NORMAL);
 }

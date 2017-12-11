@@ -32,9 +32,7 @@ Pixel Texture::getPixel(int x, int y) const
 void Texture::setPixel(int x, int y, Pixel p)
 {
 	if (x >= image.width() || y >= image.height()) {
-		printf("setPixel in texture\n");
 		printf("Invalid coordinates: %d, %d\n", x, y);
-		printf("image width: %d, height: %d\n", image.width(), image.height());
 	}
 	pixelsFilled[x][y] = true;
 	image(x, y, 0, R) = (unsigned char)p.r;
@@ -65,7 +63,6 @@ void Texture::clear()
 Pixel Patch::getPixel(int x, int y) const
 {
 	if (x >= width || y >= width) {
-		printf("getPixel in patch\n");
 		printf("Invalid coordinates: %d, %d\n", x, y);
 		return error_pixel;
 	}
@@ -80,7 +77,6 @@ Pixel Patch::getCenterPixel() const
 void Patch::setPixel(int x, int y, Pixel p)
 {
 	if (x >= width || y >= width) {
-		printf("setPixel in patch\n");
 		printf("Invalid coordinates: %d, %d\n", x, y);
 	}
 	sourceImage->setPixel(x + offsetX, y + offsetY, p);
@@ -114,13 +110,15 @@ float Patch::difference(const Patch& other, float** gaussian) const
 	uint diff = 0;
 	Pixel pixelA;
 	Pixel pixelB;
+	float pixelNorm;
 
 	// Otherwise go through whole patch and store for later
 	
 	for (pair<int,int> p : validPixels){
-			pixelA = getPixel(p.first, p.second);
-			pixelB = other.getPixel(p.first, p.second);
-			diff += pixel_L1Norm(pixelA, pixelB) * gaussian[p.first][p.second];
+		pixelA = getPixel(p.first, p.second);
+		pixelB = other.getPixel(p.first, p.second);
+		pixelNorm = pixel_L1Norm(pixelA, pixelB) * (gaussian != nullptr ? gaussian[p.first][p.second] : 1);
+		diff += pixelNorm;
 	}
 	
 	// Dividing by sum again seems to make it worse.
@@ -349,10 +347,11 @@ void Synth::assignColor(uint a, uint b)
 
 	//get differences from all sample patches
 	Patch sam;
+	float** gaussianWeights = useGaussian ? gaussian : nullptr;
 	for (int i = 0; i < sampleSideLength - patchSize; i++) {
 		for (int j = 0; j < sampleSideLength - patchSize; j++) {
 			sam = sample.getPatch(i, j, patchSize);
-			float diff = res.difference(sam, gaussian);
+			float diff = res.difference(sam, gaussianWeights);
 			if (diffs.size() <= 5) {
 				diffs.push_back(make_pair(diff, make_pair(i, j)));
 			} else {

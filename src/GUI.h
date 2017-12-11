@@ -14,18 +14,19 @@
 #include <FL/Fl_Box.H>
 
 struct GUI {
- 	Fl_Window* mainWindow;
-   	Fl_Value_Slider* patchSizeSlider;
-   	Fl_Value_Slider* resultSizeSlider;
-   	Fl_Return_Button* synthButton;
-   	Fl_Check_Button* saveOptionButton;
-   	Fl_Input* saveFileNameInput;
-        Fl_Box* seedPlacementLabel;
-        Fl_Round_Button* centerOptionButton;
-        Fl_Round_Button* cornerOptionButton;
-        Fl_Box* seedTypeLabel;
-        Fl_Round_Button* randomPatchSeedButton;
-        Fl_Round_Button* wholeImageSeedButton;
+  Fl_Window* mainWindow;
+  Fl_Value_Slider* patchSizeSlider;
+  Fl_Value_Slider* resultSizeSlider;
+  Fl_Return_Button* synthButton;
+  Fl_Check_Button* saveOptionButton;
+  Fl_Input* saveFileNameInput;
+  Fl_Box* seedPlacementLabel;
+  Fl_Round_Button* centerOptionButton;
+  Fl_Round_Button* cornerOptionButton;
+  Fl_Box* seedTypeLabel;
+  Fl_Round_Button* randomPatchSeedButton;
+  Fl_Round_Button* wholeImageSeedButton;
+  Fl_Check_Button* useGaussianButton;
 
 
  	GUI();

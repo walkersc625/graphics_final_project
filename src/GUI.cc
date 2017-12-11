@@ -9,7 +9,7 @@ using namespace std::placeholders;
 
 GUI::GUI()
 {
-    mainWindow = new Fl_Window(430, 290, "Look at this glorious little window");
+    mainWindow = new Fl_Window(430, 350, "Look at this glorious little window");
 
     patchSizeSlider = new Fl_Value_Slider(15, 15, 400, 25, "Patch size");
     patchSizeSlider->type(FL_HOR_NICE_SLIDER);
@@ -20,7 +20,7 @@ GUI::GUI()
 
     resultSizeSlider = new Fl_Value_Slider(15, 75, 400, 25, "Result size");
     resultSizeSlider->type(FL_HOR_NICE_SLIDER);
-    resultSizeSlider->bounds(128, 512);
+    resultSizeSlider->bounds(128, 1024);
     resultSizeSlider->value(128);
     resultSizeSlider->slider_size(0.15);
     resultSizeSlider->precision(0);
@@ -55,10 +55,14 @@ GUI::GUI()
     cornerOptionButton->callback(cornerOptionButtonCallback, this);
     cornerOptionButton->value(0);
 
+    // Use gaussian filter option
+
+    useGaussianButton = new Fl_Check_Button(15, 250, 25, 25, "Use Gaussian filter weights in difference calculations?");
+    useGaussianButton->value(true);
+
     /* Start Button */
-    synthButton = new Fl_Return_Button(15, 250, 150, 25, "Synthesize");
+    synthButton = new Fl_Return_Button(15, 300, 150, 25, "Synthesize");
     synthButton->callback(synthButtonCallback);
-    //bind(GUI::synthButtonCallback, this, _1, _2)
 
     mainWindow->end();
 
@@ -76,7 +80,6 @@ GUI::~GUI()
 
 void GUI::synthButtonCallback(Fl_Widget* w, void* v)
 {
-    cout << "in callback function\n";
     w->window()->hide();
 }
 
