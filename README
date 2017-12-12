@@ -14,16 +14,19 @@ bin/texture
 Running instructions:
 
 First, you will be prompted to provide a sample texture to synthesize from. We
-have included several textures in the assets/ folder, but any square image file
-will work. We recommend using the textures in assets/tiny, because these are
-much smaller and will run much faster.
+have included several textures in the assets/ folder, but any square image
+file will work. Smaller texture samples will run faster, so we recommend using
+the textures in the assets/tiny/ directory.
 
-Next, you can input your parameters using the GUI. We recommend using a small
-patch size for speed (15 or less), and a relatively small output size. You
-also have the option to use the whole image or a random patch as a starting
-seed, and to synthesize starting from the center or from the top left corner.
+Next, you can input your parameters, such as patch size and the amount of
+texture to synthesize, using the GUI. We recommend using a small patch size
+for speed (15 or less), and a relatively small output size. You also have the
+option to use the whole image or a random patch as a starting seed, and to
+synthesize starting from the center or from the top left corner.
 
 If you would like to save the results, you can add an output filename. On
-closing, the file will be saved in the results/ directory in whatever format is
-implied by the file extension. To close the program "correctly" (so that it
+closing, the file will be saved in the results/ directory in whatever format
+is implied by the file extension. To close the program "correctly" (so that it
 saves the image), close one of the windows displaying an image.
+
+Our report can be found at http://www.cs.utexas.edu/~walkersc/report.pdf
